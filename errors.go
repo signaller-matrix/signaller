@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/nxshock/go-lightning/matrix"
+	"github.com/nxshock/signaller/matrix"
 )
 
 func errorResponse(w http.ResponseWriter, code matrix.ApiError, httpCode int, message string) {

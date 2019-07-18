@@ -1,6 +1,6 @@
 package main
 
-import "github.com/nxshock/go-lightning/matrix"
+import "github.com/nxshock/signaller/matrix"
 
 type Backend interface {
 	Register(username, password, device string) (token string, error *matrix.ApiError)

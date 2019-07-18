@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nxshock/go-lightning/matrix"
+	"github.com/nxshock/signaller/matrix"
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {

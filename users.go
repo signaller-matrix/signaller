@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/nxshock/go-lightning/matrix"
+	"github.com/nxshock/signaller/matrix"
 )
 
 var first bool
