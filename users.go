@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/nxshock/signaller/matrix"
+	"github.com/nxshock/signaller/models"
 )
 
 var first bool
@@ -29,12 +29,12 @@ func NewMemoryBackend() *MemoryBackend {
 	return &MemoryBackend{data: make(map[string]*User)}
 }
 
-func (memoryBackend MemoryBackend) Register(username, password, device string) (token string, err *matrix.ApiError) {
+func (memoryBackend MemoryBackend) Register(username, password, device string) (token string, err *models.ApiError) {
 	memoryBackend.mutex.Lock()
 	defer memoryBackend.mutex.Unlock()
 
 	if _, ok := memoryBackend.data[username]; ok {
-		return "", NewError(matrix.M_USER_IN_USE, "trying to register a user ID which has been taken")
+		return "", NewError(models.M_USER_IN_USE, "trying to register a user ID which has been taken")
 	}
 
 	token = newToken(DefaultTokenSize)
@@ -48,17 +48,17 @@ func (memoryBackend MemoryBackend) Register(username, password, device string) (
 	return token, nil
 }
 
-func (memoryBackend MemoryBackend) Login(username, password, device string) (token string, err *matrix.ApiError) {
+func (memoryBackend MemoryBackend) Login(username, password, device string) (token string, err *models.ApiError) {
 	memoryBackend.mutex.Lock()
 	defer memoryBackend.mutex.Unlock()
 
 	user, ok := memoryBackend.data[username]
 	if !ok {
-		return "", NewError(matrix.M_FORBIDDEN, "wrong username")
+		return "", NewError(models.M_FORBIDDEN, "wrong username")
 	}
 
 	if user.Password != password {
-		return "", NewError(matrix.M_FORBIDDEN, "wrong password")
+		return "", NewError(models.M_FORBIDDEN, "wrong password")
 	}
 
 	token = newToken(DefaultTokenSize)
@@ -68,7 +68,7 @@ func (memoryBackend MemoryBackend) Login(username, password, device string) (tok
 	return token, nil
 }
 
-func (memoryBackend MemoryBackend) Logout(token string) *matrix.ApiError {
+func (memoryBackend MemoryBackend) Logout(token string) *models.ApiError {
 	memoryBackend.mutex.Lock()
 	defer memoryBackend.mutex.Unlock()
 
@@ -81,10 +81,10 @@ func (memoryBackend MemoryBackend) Logout(token string) *matrix.ApiError {
 		}
 	}
 
-	return NewError(matrix.M_UNKNOWN_TOKEN, "unknown token") // TODO: create error struct
+	return NewError(models.M_UNKNOWN_TOKEN, "unknown token") // TODO: create error struct
 }
 
-func (memoryBackend MemoryBackend) Sync(token string, request matrix.SyncRequest) (response *matrix.SyncReply, err *matrix.ApiError) {
+func (memoryBackend MemoryBackend) Sync(token string, request models.SyncRequest) (response *models.SyncReply, err *models.ApiError) {
 	memoryBackend.mutex.Lock()
 	defer memoryBackend.mutex.Unlock()
 
@@ -92,29 +92,29 @@ func (memoryBackend MemoryBackend) Sync(token string, request matrix.SyncRequest
 
 	if !first {
 		log.Println(1)
-		response = &matrix.SyncReply{
-			AccountData: matrix.AccountData{
-				Events: []matrix.Event{
-					matrix.Event{Type: "m.direct", Content: json.RawMessage(`"@vasyo2:localhost":"!room1:localhost"`)},
+		response = &models.SyncReply{
+			AccountData: models.AccountData{
+				Events: []models.Event{
+					models.Event{Type: "m.direct", Content: json.RawMessage(`"@vasyo2:localhost":"!room1:localhost"`)},
 				}},
-			Rooms: matrix.RoomsSyncReply{
-				Join: map[string]matrix.JoinedRoom{
-					"!room1:localhost": matrix.JoinedRoom{
-						Timeline: matrix.Timeline{
-							Events: []matrix.RoomEvent{
-								matrix.RoomEvent{Type: "m.room.create", Sender: "@vasyo2:localhost"},
-								matrix.RoomEvent{Type: "m.room.member", Sender: "@vasyo2:localhost", Content: json.RawMessage(`membership:"join",displayname:"vasyo2"`)},
+			Rooms: models.RoomsSyncReply{
+				Join: map[string]models.JoinedRoom{
+					"!room1:localhost": models.JoinedRoom{
+						Timeline: models.Timeline{
+							Events: []models.RoomEvent{
+								models.RoomEvent{Type: "m.room.create", Sender: "@vasyo2:localhost"},
+								models.RoomEvent{Type: "m.room.member", Sender: "@vasyo2:localhost", Content: json.RawMessage(`membership:"join",displayname:"vasyo2"`)},
 							}}}}}}
-		/*					InviteState: matrix.InviteState{
-							Events: []matrix.StrippedState{
-								matrix.StrippedState{Type: "m.room.join_rules", Content: json.RawMessage(`join_rule:"invite"`), Sender: "@vasyo2:" + server.Address},
-								matrix.StrippedState{Type: "m.room.member", Content: json.RawMessage(`membership:"join",displayname:"vasyo2"`), Sender: "@vasyo2:" + server.Address},
-								matrix.StrippedState{Type: "m.room.member", Content: json.RawMessage(`is_direct:"true",membership:"invite",displayname:"vasyo"`), Sender: "@vasyo2:" + server.Address},
+		/*					InviteState: models.InviteState{
+							Events: []models.StrippedState{
+								models.StrippedState{Type: "m.room.join_rules", Content: json.RawMessage(`join_rule:"invite"`), Sender: "@vasyo2:" + server.Address},
+								models.StrippedState{Type: "m.room.member", Content: json.RawMessage(`membership:"join",displayname:"vasyo2"`), Sender: "@vasyo2:" + server.Address},
+								models.StrippedState{Type: "m.room.member", Content: json.RawMessage(`is_direct:"true",membership:"invite",displayname:"vasyo"`), Sender: "@vasyo2:" + server.Address},
 							}}}}}}*/
 		first = true
 	} else {
 		os.Exit(0)
-		response = &matrix.SyncReply{}
+		response = &models.SyncReply{}
 	}
 
 	return response, nil // TODO: implement

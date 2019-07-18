@@ -1,4 +1,4 @@
-package matrix
+package models
 
 // LoginRequest represents login request
 // https://matrix.org/docs/spec/client_server/r0.4.0.html#post-matrix-client-r0-login

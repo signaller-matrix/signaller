@@ -1,10 +1,10 @@
 package main
 
-import "github.com/nxshock/signaller/matrix"
+import "github.com/nxshock/signaller/models"
 
 type Backend interface {
-	Register(username, password, device string) (token string, error *matrix.ApiError)
-	Login(username, password, device string) (token string, err *matrix.ApiError)
-	Logout(token string) *matrix.ApiError
-	Sync(token string, request matrix.SyncRequest) (response *matrix.SyncReply, err *matrix.ApiError)
+	Register(username, password, device string) (token string, error *models.ApiError)
+	Login(username, password, device string) (token string, err *models.ApiError)
+	Logout(token string) *models.ApiError
+	Sync(token string, request models.SyncRequest) (response *models.SyncReply, err *models.ApiError)
 }

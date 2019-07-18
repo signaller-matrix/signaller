@@ -3,10 +3,10 @@ package main
 import (
 	"net/http"
 
-	"github.com/nxshock/signaller/matrix"
+	"github.com/nxshock/signaller/models"
 )
 
-func errorResponse(w http.ResponseWriter, code matrix.ApiError, httpCode int, message string) {
+func errorResponse(w http.ResponseWriter, code models.ApiError, httpCode int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if message != "" {
@@ -17,7 +17,7 @@ func errorResponse(w http.ResponseWriter, code matrix.ApiError, httpCode int, me
 	w.Write(code.JSON())
 }
 
-func NewError(code matrix.ApiError, message string) *matrix.ApiError {
+func NewError(code models.ApiError, message string) *models.ApiError {
 	if message != "" {
 		code.Message = message
 	}

@@ -1,4 +1,4 @@
-package matrix
+package models
 
 type MRelatesTo struct {
 	InReplyTo MInReplyTo `json:"m.in_reply_to"`

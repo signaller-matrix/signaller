@@ -1,4 +1,4 @@
-package matrix
+package models
 
 type JoinedRoomReply struct {
 	JoinedRooms []string `json:"joined_rooms"`

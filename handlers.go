@@ -8,28 +8,28 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nxshock/signaller/matrix"
+	"github.com/nxshock/signaller/models"
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.RequestURI)
 }
 
-// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-versions
+// https://models.org/docs/spec/client_server/latest#get-models-client-versions
 func VersionHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		errorResponse(w, matrix.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
 		return
 	}
 
-	response := matrix.VersionsReply{Versions: []string{Version}}
+	response := models.VersionsReply{Versions: []string{Version}}
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
-// https://matrix.org/docs/spec/client_server/latest#login
+// https://models.org/docs/spec/client_server/latest#login
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
-	// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-login
+	// https://models.org/docs/spec/client_server/latest#get-models-client-r0-login
 	case "GET":
 		{
 			type LoginFlow struct {
@@ -47,10 +47,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 			sendJsonResponse(w, http.StatusOK, response)
 		}
 
-	// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-login
+	// https://models.org/docs/spec/client_server/latest#post-models-client-r0-login
 	case "POST":
 		{
-			var request matrix.LoginRequest
+			var request models.LoginRequest
 			getRequest(r, &request) // TODO: handle error
 
 			// delete start "@" if presents
@@ -64,7 +64,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			response := matrix.LoginReply{
+			response := models.LoginReply{
 				UserID:      request.Identifier.User,
 				AccessToken: token}
 
@@ -73,17 +73,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-logout
+// https://models.org/docs/spec/client_server/latest#post-models-client-r0-logout
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		errorResponse(w, matrix.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
 		return
 	}
 
 	token := getTokenFromResponse(r)
 
 	if token == "" {
-		errorResponse(w, matrix.M_MISSING_TOKEN, http.StatusBadRequest, "")
+		errorResponse(w, models.M_MISSING_TOKEN, http.StatusBadRequest, "")
 		return
 	}
 
@@ -96,20 +96,20 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonResponse(w, http.StatusOK, struct{}{})
 }
 
-// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-register
+// https://models.org/docs/spec/client_server/latest#post-models-client-r0-register
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		errorResponse(w, matrix.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
 		return
 	}
 
 	kind := r.FormValue("kind")
 	if kind != "user" {
-		errorResponse(w, matrix.M_UNKNOWN, http.StatusBadRequest, "wrong kind: "+kind)
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong kind: "+kind)
 		return
 	}
 
-	var request matrix.RegisterRequest
+	var request models.RegisterRequest
 	getRequest(r, &request) // TODO: handle error
 
 	token, apiErr := server.Backend.Register(request.Username, request.Password, request.DeviceID)
@@ -118,7 +118,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response matrix.RegisterResponse
+	var response models.RegisterResponse
 	response.UserID = "@" + request.Username
 	response.DeviceID = request.DeviceID
 	response.AccessToken = token
@@ -126,14 +126,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
-// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-sync
+// https://models.org/docs/spec/client_server/latest#get-models-client-r0-sync
 func SyncHandler(w http.ResponseWriter, r *http.Request) {
-	var request matrix.SyncRequest
+	var request models.SyncRequest
 	request.Filter = r.FormValue("filter")
 
 	timeout, err := strconv.Atoi(r.FormValue("timeout"))
 	if err != nil {
-		errorResponse(w, matrix.M_UNKNOWN, http.StatusBadRequest, "timeout parse failes")
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "timeout parse failes")
 		return
 	}
 	request.Timeout = timeout
@@ -141,14 +141,14 @@ func SyncHandler(w http.ResponseWriter, r *http.Request) {
 
 	token := getTokenFromResponse(r)
 	if token == "" {
-		errorResponse(w, matrix.M_MISSING_TOKEN, http.StatusBadRequest, "")
+		errorResponse(w, models.M_MISSING_TOKEN, http.StatusBadRequest, "")
 		return
 	}
 
 	response, _ := server.Backend.Sync(token, request) // TODO: handle error
 
 	response.NextBatch = "123"
-	response.Rooms = matrix.RoomsSyncReply{}
+	response.Rooms = models.RoomsSyncReply{}
 
 	sendJsonResponse(w, http.StatusOK, response)
 }

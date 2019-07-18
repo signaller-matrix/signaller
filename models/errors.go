@@ -1,4 +1,4 @@
-package matrix
+package models
 
 import (
 	"encoding/json"

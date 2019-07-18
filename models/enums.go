@@ -1,4 +1,4 @@
-package matrix
+package models
 
 type Membership string
 
