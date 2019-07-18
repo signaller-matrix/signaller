@@ -1,0 +1,14 @@
+language: go
+
+go:
+  - 1.x
+  - master
+
+before_install:
+  - go get github.com/nxshock/colorcrop/...
+
+script:
+  - $HOME/gopath/bin/goveralls -service=travis-ci
+
+notifications:
+  email: false
