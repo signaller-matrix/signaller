@@ -5,7 +5,7 @@ go:
   - master
 
 before_install:
-  - go get github.com/nxshock/colorcrop/...
+  - go get github.com/nxshock/signaller/...
 
 script:
   - $HOME/gopath/bin/goveralls -service=travis-ci
