@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nxshock/signaller/internal/models/common"
+
 	"github.com/nxshock/signaller/internal/models"
 	login "github.com/nxshock/signaller/internal/models/login"
 	register "github.com/nxshock/signaller/internal/models/register"
@@ -35,21 +37,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// https://models.org/docs/spec/client_server/latest#get-models-client-r0-login
 	case "GET":
 		{
-			type LoginFlow struct {
-				Type string `json:"type"`
+			response := login.GetLoginReply{
+				Flows: []login.Flow{
+					login.Flow{Type: common.AuthenticationTypePassword},
+				},
 			}
-
-			type Response struct {
-				Flows []LoginFlow `json:"flows"`
-			}
-
-			response := Response{
-				Flows: []LoginFlow{
-					LoginFlow{Type: string(M_LOGIN_PASSWORD)}}}
 
 			sendJsonResponse(w, http.StatusOK, response)
 		}
-
 	// https://models.org/docs/spec/client_server/latest#post-models-client-r0-login
 	case "POST":
 		{
@@ -69,7 +64,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 			response := login.LoginReply{
 				UserID:      request.Identifier.User,
-				AccessToken: token}
+				AccessToken: token,
+			}
 
 			sendJsonResponse(w, http.StatusOK, response)
 		}
