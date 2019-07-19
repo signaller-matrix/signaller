@@ -7,6 +7,8 @@ import (
 	"sync"
 
 	"github.com/nxshock/signaller/internal/models"
+	"github.com/nxshock/signaller/internal/models/common"
+	mSync "github.com/nxshock/signaller/internal/models/sync"
 )
 
 var first bool
@@ -84,7 +86,7 @@ func (memoryBackend MemoryBackend) Logout(token string) *models.ApiError {
 	return NewError(models.M_UNKNOWN_TOKEN, "unknown token") // TODO: create error struct
 }
 
-func (memoryBackend MemoryBackend) Sync(token string, request models.SyncRequest) (response *models.SyncReply, err *models.ApiError) {
+func (memoryBackend MemoryBackend) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err *models.ApiError) {
 	memoryBackend.mutex.Lock()
 	defer memoryBackend.mutex.Unlock()
 
@@ -92,18 +94,18 @@ func (memoryBackend MemoryBackend) Sync(token string, request models.SyncRequest
 
 	if !first {
 		log.Println(1)
-		response = &models.SyncReply{
-			AccountData: models.AccountData{
-				Events: []models.Event{
-					models.Event{Type: "m.direct", Content: json.RawMessage(`"@vasyo2:localhost":"!room1:localhost"`)},
+		response = &mSync.SyncReply{
+			AccountData: common.AccountData{
+				Events: []common.Event{
+					common.Event{Type: "m.direct", Content: json.RawMessage(`"@vasyo2:localhost":"!room1:localhost"`)},
 				}},
-			Rooms: models.RoomsSyncReply{
-				Join: map[string]models.JoinedRoom{
-					"!room1:localhost": models.JoinedRoom{
-						Timeline: models.Timeline{
-							Events: []models.RoomEvent{
-								models.RoomEvent{Type: "m.room.create", Sender: "@vasyo2:localhost"},
-								models.RoomEvent{Type: "m.room.member", Sender: "@vasyo2:localhost", Content: json.RawMessage(`membership:"join",displayname:"vasyo2"`)},
+			Rooms: mSync.RoomsSyncReply{
+				Join: map[string]common.JoinedRoom{
+					"!room1:localhost": common.JoinedRoom{
+						Timeline: common.Timeline{
+							Events: []common.RoomEvent{
+								common.RoomEvent{Type: "m.room.create", Sender: "@vasyo2:localhost"},
+								common.RoomEvent{Type: "m.room.member", Sender: "@vasyo2:localhost", Content: json.RawMessage(`membership:"join",displayname:"vasyo2"`)},
 							}}}}}}
 		/*					InviteState: models.InviteState{
 							Events: []models.StrippedState{
@@ -114,7 +116,7 @@ func (memoryBackend MemoryBackend) Sync(token string, request models.SyncRequest
 		first = true
 	} else {
 		os.Exit(0)
-		response = &models.SyncReply{}
+		response = &mSync.SyncReply{}
 	}
 
 	return response, nil // TODO: implement

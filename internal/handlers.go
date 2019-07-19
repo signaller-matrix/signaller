@@ -9,6 +9,9 @@ import (
 	"strings"
 
 	"github.com/nxshock/signaller/internal/models"
+	login "github.com/nxshock/signaller/internal/models/login"
+	register "github.com/nxshock/signaller/internal/models/register"
+	mSync "github.com/nxshock/signaller/internal/models/sync"
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +53,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// https://models.org/docs/spec/client_server/latest#post-models-client-r0-login
 	case "POST":
 		{
-			var request models.LoginRequest
+			var request login.LoginRequest
 			getRequest(r, &request) // TODO: handle error
 
 			// delete start "@" if presents
@@ -64,7 +67,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			response := models.LoginReply{
+			response := login.LoginReply{
 				UserID:      request.Identifier.User,
 				AccessToken: token}
 
@@ -109,7 +112,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request models.RegisterRequest
+	var request register.RegisterRequest
 	getRequest(r, &request) // TODO: handle error
 
 	token, apiErr := currServer.Backend.Register(request.Username, request.Password, request.DeviceID)
@@ -118,7 +121,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var response models.RegisterResponse
+	var response register.RegisterResponse
 	response.UserID = "@" + request.Username
 	response.DeviceID = request.DeviceID
 	response.AccessToken = token
@@ -128,7 +131,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 // https://models.org/docs/spec/client_server/latest#get-models-client-r0-sync
 func SyncHandler(w http.ResponseWriter, r *http.Request) {
-	var request models.SyncRequest
+	var request mSync.SyncRequest
 	request.Filter = r.FormValue("filter")
 
 	timeout, err := strconv.Atoi(r.FormValue("timeout"))
@@ -148,7 +151,7 @@ func SyncHandler(w http.ResponseWriter, r *http.Request) {
 	response, _ := currServer.Backend.Sync(token, request) // TODO: handle error
 
 	response.NextBatch = "123"
-	response.Rooms = models.RoomsSyncReply{}
+	response.Rooms = mSync.RoomsSyncReply{}
 
 	sendJsonResponse(w, http.StatusOK, response)
 }
