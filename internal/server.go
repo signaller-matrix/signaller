@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var currServer Server
+var currServer *Server
 
 type Server struct {
 	httpServer *http.Server
@@ -33,7 +33,7 @@ func New() *Server {
 		httpServer: httpServer,
 		router:     router}
 
-	currServer = *server
+	currServer = server
 	return server
 }
 
