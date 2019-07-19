@@ -26,7 +26,7 @@ func New() *Server {
 	router.HandleFunc("/", RootHandler)
 
 	httpServer := new(http.Server)
-	httpServer.Addr = ":80"
+	httpServer.Addr = ":8008"
 	httpServer.Handler = router
 
 	server := &Server{
