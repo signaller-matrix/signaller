@@ -1,10 +1,12 @@
-package main
+package internal
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
+
+var currServer Server
 
 type Server struct {
 	httpServer *http.Server
@@ -31,6 +33,7 @@ func New() *Server {
 		httpServer: httpServer,
 		router:     router}
 
+	currServer = *server
 	return server
 }
 

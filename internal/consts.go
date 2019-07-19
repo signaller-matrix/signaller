@@ -1,4 +1,4 @@
-package main
+package internal
 
 const (
 	Version   = "r0.5.0"

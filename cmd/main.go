@@ -2,16 +2,18 @@ package main
 
 import (
 	"log"
+
+	internal "github.com/nxshock/signaller/internal"
 )
 
 var (
-	server *Server
+	server *internal.Server
 )
 
 func init() {
-	server = New()
+	server = internal.New()
 	server.Address = "localhost"
-	server.Backend = NewMemoryBackend()
+	server.Backend = internal.NewMemoryBackend()
 	server.Backend.Register("andrew", "1", "")
 }
 

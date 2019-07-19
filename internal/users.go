@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/nxshock/signaller/models"
+	"github.com/nxshock/signaller/internal/models"
 )
 
 var first bool
