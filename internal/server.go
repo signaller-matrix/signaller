@@ -1,10 +1,12 @@
-package main
+package internal
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
 )
+
+var currServer Server
 
 type Server struct {
 	httpServer *http.Server
@@ -24,13 +26,14 @@ func New() *Server {
 	router.HandleFunc("/", RootHandler)
 
 	httpServer := new(http.Server)
-	httpServer.Addr = ":80"
+	httpServer.Addr = ":8008"
 	httpServer.Handler = router
 
 	server := &Server{
 		httpServer: httpServer,
 		router:     router}
 
+	currServer = *server
 	return server
 }
 

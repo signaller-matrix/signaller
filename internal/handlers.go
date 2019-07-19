@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nxshock/signaller/models"
+	"github.com/nxshock/signaller/internal/models"
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +58,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				request.Identifier.User = strings.TrimPrefix(request.Identifier.User, "@")
 			}
 
-			token, apiErr := server.Backend.Login(request.Identifier.User, request.Password, request.DeviceID)
+			token, apiErr := currServer.Backend.Login(request.Identifier.User, request.Password, request.DeviceID)
 			if apiErr != nil {
 				errorResponse(w, *apiErr, http.StatusForbidden, "")
 				return
@@ -87,7 +87,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiErr := server.Backend.Logout(token)
+	apiErr := currServer.Backend.Logout(token)
 	if apiErr != nil {
 		errorResponse(w, *apiErr, http.StatusBadRequest, "") // TODO: check code
 		return
@@ -112,7 +112,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var request models.RegisterRequest
 	getRequest(r, &request) // TODO: handle error
 
-	token, apiErr := server.Backend.Register(request.Username, request.Password, request.DeviceID)
+	token, apiErr := currServer.Backend.Register(request.Username, request.Password, request.DeviceID)
 	if apiErr != nil {
 		errorResponse(w, *apiErr, http.StatusBadRequest, "")
 		return
@@ -145,7 +145,7 @@ func SyncHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response, _ := server.Backend.Sync(token, request) // TODO: handle error
+	response, _ := currServer.Backend.Sync(token, request) // TODO: handle error
 
 	response.NextBatch = "123"
 	response.Rooms = models.RoomsSyncReply{}

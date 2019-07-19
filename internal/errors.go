@@ -1,9 +1,9 @@
-package main
+package internal
 
 import (
 	"net/http"
 
-	"github.com/nxshock/signaller/models"
+	"github.com/nxshock/signaller/internal/models"
 )
 
 func errorResponse(w http.ResponseWriter, code models.ApiError, httpCode int, message string) {

@@ -1,6 +1,6 @@
-package main
+package internal
 
-import "github.com/nxshock/signaller/models"
+import "github.com/nxshock/signaller/internal/models"
 
 type Backend interface {
 	Register(username, password, device string) (token string, error *models.ApiError)
