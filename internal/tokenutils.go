@@ -8,7 +8,7 @@ import (
 )
 
 // newToken returns new generated token with specified length
-func newToken(size int) string {
+func NewToken(size int) string {
 	b := make([]byte, size)
 	rand.Read(b)
 

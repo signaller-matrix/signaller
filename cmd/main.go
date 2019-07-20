@@ -3,7 +3,8 @@ package main
 import (
 	"log"
 
-	internal "github.com/nxshock/signaller/internal"
+	"github.com/nxshock/signaller/internal"
+	"github.com/nxshock/signaller/internal/backends/memory"
 )
 
 var (
@@ -13,7 +14,7 @@ var (
 func init() {
 	server = internal.New()
 	server.Address = "localhost"
-	server.Backend = internal.NewMemoryBackend()
+	server.Backend = memory.NewBackend()
 	server.Backend.Register("andrew", "1", "")
 }
 

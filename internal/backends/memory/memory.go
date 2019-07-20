@@ -1,4 +1,4 @@
-package internal
+package memory
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/nxshock/signaller/internal"
 	"github.com/nxshock/signaller/internal/models"
 	"github.com/nxshock/signaller/internal/models/common"
 	mSync "github.com/nxshock/signaller/internal/models/sync"
@@ -13,7 +14,7 @@ import (
 
 var first bool
 
-type MemoryBackend struct {
+type Backend struct {
 	data  map[string]*User
 	mutex sync.Mutex // TODO: replace with RW mutex
 }
@@ -27,21 +28,21 @@ type Token struct {
 	Device string
 }
 
-func NewMemoryBackend() *MemoryBackend {
-	return &MemoryBackend{data: make(map[string]*User)}
+func NewBackend() *Backend {
+	return &Backend{data: make(map[string]*User)}
 }
 
-func (memoryBackend MemoryBackend) Register(username, password, device string) (token string, err *models.ApiError) {
-	memoryBackend.mutex.Lock()
-	defer memoryBackend.mutex.Unlock()
+func (backend Backend) Register(username, password, device string) (token string, err *models.ApiError) {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
 
-	if _, ok := memoryBackend.data[username]; ok {
-		return "", NewError(models.M_USER_IN_USE, "trying to register a user ID which has been taken")
+	if _, ok := backend.data[username]; ok {
+		return "", internal.NewError(models.M_USER_IN_USE, "trying to register a user ID which has been taken")
 	}
 
-	token = newToken(DefaultTokenSize)
+	token = internal.NewToken(internal.DefaultTokenSize)
 
-	memoryBackend.data[username] = &User{
+	backend.data[username] = &User{
 		Password: password,
 		Tokens: map[string]Token{
 			token: {
@@ -50,31 +51,31 @@ func (memoryBackend MemoryBackend) Register(username, password, device string) (
 	return token, nil
 }
 
-func (memoryBackend MemoryBackend) Login(username, password, device string) (token string, err *models.ApiError) {
-	memoryBackend.mutex.Lock()
-	defer memoryBackend.mutex.Unlock()
+func (backend Backend) Login(username, password, device string) (token string, err *models.ApiError) {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
 
-	user, ok := memoryBackend.data[username]
+	user, ok := backend.data[username]
 	if !ok {
-		return "", NewError(models.M_FORBIDDEN, "wrong username")
+		return "", internal.NewError(models.M_FORBIDDEN, "wrong username")
 	}
 
 	if user.Password != password {
-		return "", NewError(models.M_FORBIDDEN, "wrong password")
+		return "", internal.NewError(models.M_FORBIDDEN, "wrong password")
 	}
 
-	token = newToken(DefaultTokenSize)
+	token = internal.NewToken(internal.DefaultTokenSize)
 
-	memoryBackend.data[username].Tokens[token] = Token{Device: device}
+	backend.data[username].Tokens[token] = Token{Device: device}
 
 	return token, nil
 }
 
-func (memoryBackend MemoryBackend) Logout(token string) *models.ApiError {
-	memoryBackend.mutex.Lock()
-	defer memoryBackend.mutex.Unlock()
+func (backend Backend) Logout(token string) *models.ApiError {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
 
-	for _, user := range memoryBackend.data {
+	for _, user := range backend.data {
 		for userToken, _ := range user.Tokens {
 			if userToken == token {
 				delete(user.Tokens, token)
@@ -83,12 +84,12 @@ func (memoryBackend MemoryBackend) Logout(token string) *models.ApiError {
 		}
 	}
 
-	return NewError(models.M_UNKNOWN_TOKEN, "unknown token") // TODO: create error struct
+	return internal.NewError(models.M_UNKNOWN_TOKEN, "unknown token") // TODO: create error struct
 }
 
-func (memoryBackend MemoryBackend) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err *models.ApiError) {
-	memoryBackend.mutex.Lock()
-	defer memoryBackend.mutex.Unlock()
+func (backend Backend) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err *models.ApiError) {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
 
 	log.Println(request)
 
