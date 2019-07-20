@@ -13,3 +13,8 @@ type LoginReply struct {
 type Flow struct {
 	Type common.AuthenticationType `json:"type"`
 }
+
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-login
+type GetLoginReply struct {
+	Flows []Flow `json:"flows"` // The homeserver's supported login types
+}
