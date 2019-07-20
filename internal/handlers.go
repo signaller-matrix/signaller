@@ -37,7 +37,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// https://models.org/docs/spec/client_server/latest#get-models-client-r0-login
 	case "GET":
 		{
-			response := login.GetLoginReply{
+			response := login.GetReply{
 				Flows: []login.Flow{
 					login.Flow{Type: common.AuthenticationTypePassword},
 				},
@@ -62,7 +62,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			response := login.LoginReply{
+			response := login.PostReply{
 				UserID:      request.Identifier.User,
 				AccessToken: token,
 			}
