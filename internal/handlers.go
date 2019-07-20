@@ -14,6 +14,7 @@ import (
 	login "github.com/nxshock/signaller/internal/models/login"
 	register "github.com/nxshock/signaller/internal/models/register"
 	mSync "github.com/nxshock/signaller/internal/models/sync"
+	"github.com/nxshock/signaller/internal/models/versions"
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
@@ -27,7 +28,7 @@ func VersionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := models.VersionsReply{Versions: []string{Version}}
+	response := versions.Reply{Versions: []string{Version}}
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
