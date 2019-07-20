@@ -48,7 +48,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// https://models.org/docs/spec/client_server/latest#post-models-client-r0-login
 	case "POST":
 		{
-			var request login.LoginRequest
+			var request login.PostRequest
 			getRequest(r, &request) // TODO: handle error
 
 			// delete start "@" if presents

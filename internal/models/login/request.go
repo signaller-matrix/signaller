@@ -4,9 +4,9 @@ import (
 	common "github.com/nxshock/signaller/internal/models/common"
 )
 
-// LoginRequest represents login request
-// https://matrix.org/docs/spec/client_server/r0.4.0.html#post-matrix-client-r0-login
-type LoginRequest struct {
+// PostRequest represents POST login request
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-login
+type PostRequest struct {
 	Type                     common.AuthenticationType `json:"type"`                                  // Required. The login type being used. One of: ["m.login.password", "m.login.token"]
 	Identifier               common.UserIdentifier     `json:"identifier"`                            // Identification information for the user.
 	Password                 string                    `json:"password,omitempty"`                    // Required when type is m.login.password. The user's password.
