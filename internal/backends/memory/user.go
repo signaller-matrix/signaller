@@ -36,21 +36,58 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 		}
 	}
 
+	t := time.Now()
+
+	events := make([]RoomEvent, 0)
+
+	// Create room event
+	events = append(events, RoomEvent{
+		Content:        nil,
+		Type:           rooms.Create,
+		EventID:        internal.NewToken(eventIDSize),
+		Sender:         user,
+		OriginServerTS: t})
+
+	// Set join rules event
+	events = append(events, RoomEvent{
+		Content:        []byte(request.Visibility), // TODO: check visibility vs join rules
+		Type:           rooms.JoinRules,
+		EventID:        internal.NewToken(eventIDSize),
+		Sender:         user,
+		OriginServerTS: t})
+
+	// Set room name event
+	if request.Name != "" {
+		events = append(events, RoomEvent{
+			Content:        nil, // TODO: add
+			Type:           rooms.Name,
+			EventID:        internal.NewToken(eventIDSize),
+			Sender:         user,
+			OriginServerTS: t})
+	}
+
+	// Set room alias event
+	if request.RoomAliasName != "" {
+		events = append(events, RoomEvent{
+			Content:        nil, // TODO: add
+			Type:           rooms.CanonicalAlias,
+			EventID:        internal.NewToken(eventIDSize),
+			Sender:         user,
+			OriginServerTS: t})
+	}
+
 	room := &Room{
 		id:        internal.NewToken(groupIDSize),
 		aliasName: request.RoomAliasName,
 		name:      request.Name,
 		topic:     request.Topic,
-		events: []RoomEvent{
-			RoomEvent{
-				Content:        nil,
-				Type:           rooms.Create,
-				EventID:        internal.NewToken(eventIDSize),
-				Sender:         user,
-				OriginServerTS: time.Now()}},
-		creator: user}
+		events:    events,
+		creator:   user}
 
-	room.events[0].Room = room
+	for i, _ := range room.events {
+		room.events[i].Room = room
+		//v.Room = room
+	}
 
 	user.backend.rooms[room.id] = room
 

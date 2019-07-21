@@ -50,6 +50,15 @@ const (
 	PinnedEvents = "m.room.pinned_events"
 )
 
+type JoinRule string
+
+const (
+	Public  JoinRule = "public"
+	Knock            = "knock"
+	Invite           = "invite"
+	Private          = "private"
+)
+
 // https://matrix.org/docs/spec/client_server/latest#room-event-fields
 type Event struct {
 	Content        json.RawMessage `json:"content"`            // Required. The fields in this object will vary depending on the type of event. When interacting with the REST API, this is the HTTP body.
