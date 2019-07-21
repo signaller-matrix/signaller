@@ -2,6 +2,7 @@ package memory
 
 import (
 	"sync"
+	"time"
 
 	"github.com/nxshock/signaller/internal/models"
 
@@ -19,7 +20,7 @@ type Room struct {
 
 	creator internal.User
 
-	events []rooms.Event
+	events []RoomEvent
 
 	mutex sync.RWMutex
 }
@@ -63,7 +64,12 @@ func (room *Room) Events() []rooms.Event {
 	room.mutex.RLock()
 	defer room.mutex.RUnlock()
 
-	return room.events
+	result := make([]rooms.Event, 0)
+	for _, v := range room.events {
+		result = append(result, v.ToEvent())
+	}
+
+	return result
 }
 
 func (room *Room) Creator() internal.User {
@@ -71,13 +77,6 @@ func (room *Room) Creator() internal.User {
 	defer room.mutex.RUnlock()
 
 	return room.creator
-}
-
-func (room *Room) NewEvent(event rooms.Event) {
-	room.mutex.Lock()
-	defer room.mutex.Unlock()
-
-	room.events = append(room.events, event)
 }
 
 func (room *Room) SetTopic(user internal.User, topic string) *models.ApiError {
@@ -89,6 +88,11 @@ func (room *Room) SetTopic(user internal.User, topic string) *models.ApiError {
 	}
 
 	room.topic = topic
+	room.events = append(room.events, RoomEvent{
+		Type:           rooms.Topic,
+		Sender:         user,
+		OriginServerTS: time.Now(),
+		Room:           room})
 
 	return nil
 }

@@ -6,13 +6,57 @@ import (
 	"github.com/nxshock/signaller/internal/models/events"
 )
 
+// Type is type of event
+type Type string
+
+const (
+	// https://matrix.org/docs/spec/client_server/latest#m-room-aliases
+	Aliases Type = "m.room.aliases"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-canonical-alias
+	CanonicalAlias = "m.room.canonical_alias"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-create
+	Create = "m.room.create"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-join-rules
+	JoinRules = "m.room.join_rules"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-member
+	Member = "m.room.member"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-power-levels
+	PowerLevels = "m.room.power_levels"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-redaction
+	Redaction = "m.room.redaction"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-message
+	Message = "m.room.message"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-message-feedback
+	MessageFeedback = "m.room.message.feedback"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-name
+	Name = "m.room.name"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-topic
+	Topic = "m.room.topic"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-avatar
+	Avatar = "m.room.avatar"
+
+	// https://matrix.org/docs/spec/client_server/latest#m-room-pinned-events
+	PinnedEvents = "m.room.pinned_events"
+)
+
 // https://matrix.org/docs/spec/client_server/latest#room-event-fields
 type Event struct {
 	Content        json.RawMessage `json:"content"`            // Required. The fields in this object will vary depending on the type of event. When interacting with the REST API, this is the HTTP body.
-	Type           string          `json:"type"`               // Required. The type of event. This SHOULD be namespaced similar to Java package naming conventions e.g. 'com.example.subdomain.event.type'
+	Type           Type            `json:"type"`               // Required. The type of event. This SHOULD be namespaced similar to Java package naming conventions e.g. 'com.example.subdomain.event.type'
 	EventID        string          `json:"event_id"`           // Required. The globally unique event identifier.
 	Sender         string          `json:"sender"`             // Required. Contains the fully-qualified ID of the user who sent this event.
-	OriginServerTS int             `json:"origin_server_ts"`   // Required. Timestamp in milliseconds on originating homeserver when this event was sent.
+	OriginServerTS int64           `json:"origin_server_ts"`   // Required. Timestamp in milliseconds on originating homeserver when this event was sent.
 	Unsigned       UnsignedData    `json:"unsigned,omitempty"` // Contains optional extra information about the event.
 	RoomID         string          `json:"room_id"`            // Required. The ID of the room associated with this event. Will not be present on events that arrive through /sync, despite being required everywhere else.
 }

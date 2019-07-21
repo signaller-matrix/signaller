@@ -79,6 +79,7 @@ func TestSetRoomTopic(t *testing.T) {
 	err := room.SetTopic(user, newTopic)
 	assert.Nil(t, err)
 	assert.Equal(t, newTopic, room.Topic())
+	assert.Equal(t, 1, len(room.Events()))
 }
 
 func TestSetRoomTopicWithnprivelegedUser(t *testing.T) {
