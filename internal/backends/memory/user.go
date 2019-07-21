@@ -1,7 +1,6 @@
 package memory
 
 type User struct {
-	id       string
 	name     string
 	password string
 	Tokens   map[string]Token
@@ -10,7 +9,7 @@ type User struct {
 }
 
 func (user *User) ID() string {
-	return "@" + user.id + ":" + user.backend.hostname
+	return "@" + user.name + ":" + user.backend.hostname
 }
 
 func (user *User) Name() string {
