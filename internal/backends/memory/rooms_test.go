@@ -62,3 +62,39 @@ func TestCreateAlreadyExistingRoom(t *testing.T) {
 	_, err = backend.CreateRoom(user, request)
 	assert.NotNil(t, err)
 }
+
+func TestSetRoomTopic(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user, _, _ := backend.Register("user1", "", "")
+
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1",
+		Topic:         "topic"}
+
+	room, _ := backend.CreateRoom(user, request)
+
+	var newTopic = "new topic"
+	err := room.SetTopic(user, newTopic)
+	assert.Nil(t, err)
+	assert.Equal(t, newTopic, room.Topic())
+}
+
+func TestSetRoomTopicWithnprivelegedUser(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	creator, _, _ := backend.Register("user1", "", "")
+	user2, _, _ := backend.Register("user2", "", "")
+
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1",
+		Topic:         "topic"}
+
+	room, _ := backend.CreateRoom(creator, request)
+
+	var newTopic = "new topic"
+	err := room.SetTopic(user2, newTopic)
+	assert.NotNil(t, err)
+}

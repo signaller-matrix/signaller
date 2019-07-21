@@ -22,6 +22,7 @@ type Room interface {
 	AliasName() string
 	Name() string
 	Topic() string
+	SetTopic(user User, topic string) *models.ApiError
 	Events() []rooms.Event
 }
 
