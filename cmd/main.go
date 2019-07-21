@@ -14,7 +14,7 @@ var (
 func init() {
 	server = internal.New()
 	server.Address = "localhost"
-	server.Backend = memory.NewBackend()
+	server.Backend = memory.NewBackend(server.Address)
 	server.Backend.Register("andrew", "1", "")
 }
 

@@ -112,7 +112,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var request register.RegisterRequest
 	getRequest(r, &request) // TODO: handle error
 
-	token, apiErr := currServer.Backend.Register(request.Username, request.Password, request.DeviceID)
+	_, token, apiErr := currServer.Backend.Register(request.Username, request.Password, request.DeviceID)
 	if apiErr != nil {
 		errorResponse(w, *apiErr, http.StatusBadRequest, "")
 		return
