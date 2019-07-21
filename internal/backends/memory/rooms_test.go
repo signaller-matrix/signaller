@@ -37,7 +37,7 @@ func TestCreateRoom(t *testing.T) {
 		Name:          "room1",
 		Topic:         "topic"}
 
-	room, err := backend.CreateRoom(user, request)
+	room, err := user.CreateRoom(request)
 	assert.Nil(t, err)
 	assert.Equal(t, request.RoomAliasName, room.AliasName())
 	assert.Equal(t, request.Name, room.Name())
@@ -56,10 +56,10 @@ func TestCreateAlreadyExistingRoom(t *testing.T) {
 		Name:          "room1",
 		Topic:         "topic"}
 
-	_, err := backend.CreateRoom(user, request)
+	_, err := user.CreateRoom(request)
 	assert.Nil(t, err)
 
-	_, err = backend.CreateRoom(user, request)
+	_, err = user.CreateRoom(request)
 	assert.NotNil(t, err)
 }
 
@@ -73,13 +73,13 @@ func TestSetRoomTopic(t *testing.T) {
 		Name:          "room1",
 		Topic:         "topic"}
 
-	room, _ := backend.CreateRoom(user, request)
+	room, _ := user.CreateRoom(request)
 
 	var newTopic = "new topic"
 	err := room.SetTopic(user, newTopic)
 	assert.Nil(t, err)
 	assert.Equal(t, newTopic, room.Topic())
-	assert.Equal(t, 1, len(room.Events()))
+	assert.Equal(t, 2, len(room.Events())) // create event + topic event == 2
 }
 
 func TestSetRoomTopicWithnprivelegedUser(t *testing.T) {
@@ -93,7 +93,7 @@ func TestSetRoomTopicWithnprivelegedUser(t *testing.T) {
 		Name:          "room1",
 		Topic:         "topic"}
 
-	room, _ := backend.CreateRoom(creator, request)
+	room, _ := creator.CreateRoom(request)
 
 	var newTopic = "new topic"
 	err := room.SetTopic(user2, newTopic)

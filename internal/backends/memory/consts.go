@@ -1,3 +1,6 @@
 package memory
 
-const groupIDSize = 16
+const (
+	groupIDSize = 16
+	eventIDSize = 16
+)

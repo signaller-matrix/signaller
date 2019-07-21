@@ -5,7 +5,6 @@ import (
 
 	"github.com/nxshock/signaller/internal"
 	"github.com/nxshock/signaller/internal/models"
-	"github.com/nxshock/signaller/internal/models/createroom"
 	mSync "github.com/nxshock/signaller/internal/models/sync"
 )
 
@@ -91,23 +90,4 @@ func (backend *Backend) Sync(token string, request mSync.SyncRequest) (response 
 	defer backend.mutex.Unlock()
 
 	return nil, nil // TODO: implement
-}
-
-func (backend *Backend) CreateRoom(user internal.User, request createroom.Request) (internal.Room, *models.ApiError) {
-	for _, existingRoom := range backend.rooms {
-		if existingRoom.AliasName() == request.RoomAliasName { // TODO: strip and check request room alias name before use
-			return nil, internal.NewError(models.M_ROOM_IN_USE, "")
-		}
-	}
-
-	room := &Room{
-		id:        internal.NewToken(groupIDSize),
-		aliasName: request.RoomAliasName,
-		name:      request.Name,
-		topic:     request.Topic,
-		creator:   user}
-
-	backend.rooms[room.id] = room
-
-	return room, nil
 }
