@@ -121,7 +121,7 @@ func (user *User) LeaveRoom(room internal.Room) *models.ApiError {
 
 	for i, roomMember := range room.(*Room).joined {
 		if roomMember.ID() == user.ID() {
-			room.(*Room).joined = append(room.(*Room).joined[:i], room.(*Room).joined[i+1:]...)
+			room.(*Room).joined = append(room.(*Room).joined[:i], room.(*Room).joined[i+1:]...) // TODO: add event
 			return nil
 		}
 	}
