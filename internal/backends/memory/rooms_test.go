@@ -103,3 +103,21 @@ func TestLeaveRoom(t *testing.T) {
 	err = user.LeaveRoom(room)
 	assert.NotNil(t, err)
 }
+
+func TestRoomUserCount(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user1, _, err := backend.Register("user1", "", "")
+	assert.Nil(t, err)
+
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1",
+		Topic:         "topic"}
+
+	room, err := user1.CreateRoom(request)
+	assert.Nil(t, err)
+	assert.Len(t, room.Users(), 1)
+
+	// TODO: add join another user test
+}
