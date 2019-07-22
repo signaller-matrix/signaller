@@ -51,11 +51,11 @@ func (room *Room) Topic() string {
 	return room.topic
 }
 
-func (room *Room) Users() internal.User {
+func (room *Room) Users() []internal.User {
 	room.mutex.RLock()
 	defer room.mutex.RUnlock()
 
-	return nil // TODO: implement
+	return room.joined
 }
 
 func (room *Room) Events() []rooms.Event {

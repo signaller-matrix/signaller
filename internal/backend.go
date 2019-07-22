@@ -17,7 +17,7 @@ type Backend interface {
 type Room interface {
 	ID() string
 	Creator() User
-	Users() User
+	Users() []User
 	AliasName() string
 	Name() string
 	Topic() string
