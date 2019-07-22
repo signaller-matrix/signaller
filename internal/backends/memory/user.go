@@ -48,6 +48,8 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 		Sender:         user,
 		OriginServerTS: t})
 
+	// TODO: Add join room event
+
 	// Set join rules event
 	events = append(events, RoomEvent{
 		Content:        []byte(request.Visibility), // TODO: check visibility vs join rules
@@ -82,7 +84,8 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 		name:      request.Name,
 		topic:     request.Topic,
 		events:    events,
-		creator:   user}
+		creator:   user,
+		joined:    []internal.User{user}}
 
 	for i, _ := range room.events {
 		room.events[i].Room = room

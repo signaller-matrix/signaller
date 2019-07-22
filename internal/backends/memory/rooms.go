@@ -16,6 +16,7 @@ type Room struct {
 	topic      string
 
 	creator internal.User
+	joined  []internal.User
 
 	events []RoomEvent
 
