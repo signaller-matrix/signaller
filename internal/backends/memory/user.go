@@ -44,7 +44,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 	events = append(events, RoomEvent{
 		Content:        nil,
 		Type:           rooms.Create,
-		EventID:        internal.NewToken(eventIDSize),
+		EventID:        newToken(eventIDSize),
 		Sender:         user,
 		OriginServerTS: t})
 
@@ -54,7 +54,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 	events = append(events, RoomEvent{
 		Content:        []byte(request.Visibility), // TODO: check visibility vs join rules
 		Type:           rooms.JoinRules,
-		EventID:        internal.NewToken(eventIDSize),
+		EventID:        newToken(eventIDSize),
 		Sender:         user,
 		OriginServerTS: t})
 
@@ -63,7 +63,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 		events = append(events, RoomEvent{
 			Content:        nil, // TODO: add
 			Type:           rooms.Name,
-			EventID:        internal.NewToken(eventIDSize),
+			EventID:        newToken(eventIDSize),
 			Sender:         user,
 			OriginServerTS: t})
 	}
@@ -73,13 +73,13 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 		events = append(events, RoomEvent{
 			Content:        nil, // TODO: add
 			Type:           rooms.CanonicalAlias,
-			EventID:        internal.NewToken(eventIDSize),
+			EventID:        newToken(eventIDSize),
 			Sender:         user,
 			OriginServerTS: t})
 	}
 
 	room := &Room{
-		id:        internal.NewToken(groupIDSize),
+		id:        newToken(groupIDSize),
 		aliasName: request.RoomAliasName,
 		name:      request.Name,
 		topic:     request.Topic,

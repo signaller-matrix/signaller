@@ -34,7 +34,7 @@ func (backend *Backend) Register(username, password, device string) (user intern
 		return nil, "", internal.NewError(models.M_USER_IN_USE, "trying to register a user ID which has been taken")
 	}
 
-	token = internal.NewToken(internal.DefaultTokenSize)
+	token = newToken(defaultTokenSize)
 
 	user = &User{
 		name:     username,
@@ -62,7 +62,7 @@ func (backend *Backend) Login(username, password, device string) (token string, 
 		return "", internal.NewError(models.M_FORBIDDEN, "wrong password")
 	}
 
-	token = internal.NewToken(internal.DefaultTokenSize)
+	token = newToken(defaultTokenSize)
 
 	backend.data[username].(*User).Tokens[token] = Token{Device: device}
 

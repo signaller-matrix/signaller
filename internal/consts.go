@@ -1,8 +1,7 @@
 package internal
 
 const (
-	Version   = "r0.5.0"
-	DefaultTokenSize = 16
+	Version = "r0.5.0"
 )
 
 // https://matrix.org/docs/spec/client_server/latest#authentication-types
