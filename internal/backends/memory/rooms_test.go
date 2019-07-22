@@ -99,3 +99,25 @@ func TestSetRoomTopicWithnprivelegedUser(t *testing.T) {
 	err := user2.SetTopic(room, newTopic)
 	assert.NotNil(t, err)
 }
+
+func TestLeaveRoom(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user, _, _ := backend.Register("user1", "", "")
+
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1",
+		Topic:         "topic"}
+
+	room, _ := user.CreateRoom(request)
+
+	assert.Equal(t, 1, len(room.(*Room).joined))
+
+	err := user.LeaveRoom(room)
+	assert.Equal(t, 0, len(room.(*Room).joined))
+
+	// Try to leave room again must throw error
+	err = user.LeaveRoom(room)
+	assert.NotNil(t, err)
+}

@@ -114,3 +114,17 @@ func (user *User) SetTopic(room internal.Room, topic string) *models.ApiError {
 
 	return nil
 }
+
+func (user *User) LeaveRoom(room internal.Room) *models.ApiError {
+	room.(*Room).mutex.Lock()
+	defer room.(*Room).mutex.Unlock()
+
+	for i, roomMember := range room.(*Room).joined {
+		if roomMember.ID() == user.ID() {
+			room.(*Room).joined = append(room.(*Room).joined[:i], room.(*Room).joined[i+1:]...)
+			return nil
+		}
+	}
+
+	return internal.NewError(models.M_BAD_STATE, "you are not a member of group") // TODO: check error code
+}
