@@ -6,6 +6,7 @@ Signaller
 Currently only memory backend are supported.
 
 [![Build Status](https://travis-ci.com/nxshock/signaller.svg?branch=master)](https://travis-ci.com/nxshock/signaller)
+[![Coverage Status](https://coveralls.io/repos/github/nxshock/signaller/badge.svg)](https://coveralls.io/github/nxshock/signaller)
 
 Implemented from [Client-Server API](https://matrix.org/docs/spec/client_server/latest):
 
