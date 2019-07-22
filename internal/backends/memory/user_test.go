@@ -6,22 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRegisterUser(t *testing.T) {
-	backend := NewBackend("localhost")
-
-	var (
-		username = "user1"
-		password = "password1"
-		device   = "device1"
-	)
-
-	user, token, err := backend.Register(username, password, device)
-	assert.Nil(t, err)
-	assert.Equal(t, username, user.Name())
-	assert.Equal(t, password, user.Password())
-	assert.NotEmpty(t, token)
-}
-
 func TestUserID(t *testing.T) {
 	var (
 		userName       = "user1"
