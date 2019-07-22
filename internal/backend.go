@@ -21,7 +21,6 @@ type Room interface {
 	AliasName() string
 	Name() string
 	Topic() string
-	SetTopic(user User, topic string) *models.ApiError
 	Events() []rooms.Event
 }
 
@@ -30,4 +29,5 @@ type User interface {
 	ID() string
 	Password() string
 	CreateRoom(request createroom.Request) (Room, *models.ApiError)
+	SetTopic(room Room, topic string) *models.ApiError
 }

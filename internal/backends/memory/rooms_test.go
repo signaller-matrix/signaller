@@ -76,7 +76,7 @@ func TestSetRoomTopic(t *testing.T) {
 	room, _ := user.CreateRoom(request)
 
 	var newTopic = "new topic"
-	err := room.SetTopic(user, newTopic)
+	err := user.SetTopic(room, newTopic)
 	assert.Nil(t, err)
 	assert.Equal(t, newTopic, room.Topic())
 	assert.Equal(t, 5, len(room.Events())) // TODO: check start event count
@@ -96,6 +96,6 @@ func TestSetRoomTopicWithnprivelegedUser(t *testing.T) {
 	room, _ := creator.CreateRoom(request)
 
 	var newTopic = "new topic"
-	err := room.SetTopic(user2, newTopic)
+	err := user2.SetTopic(room, newTopic)
 	assert.NotNil(t, err)
 }

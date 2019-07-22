@@ -93,3 +93,21 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 
 	return room, nil
 }
+
+func (user *User) SetTopic(room internal.Room, topic string) *models.ApiError {
+	room.(*Room).mutex.Lock()
+	defer room.(*Room).mutex.Unlock()
+
+	if room.(*Room).creator.ID() != user.ID() { // TODO: currently only creator can change topic
+		return internal.NewError(models.M_FORBIDDEN, "")
+	}
+
+	room.(*Room).topic = topic
+	room.(*Room).events = append(room.(*Room).events, RoomEvent{
+		Type:           rooms.Topic,
+		Sender:         user,
+		OriginServerTS: time.Now(),
+		Room:           room})
+
+	return nil
+}
