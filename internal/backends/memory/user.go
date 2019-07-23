@@ -128,3 +128,29 @@ func (user *User) LeaveRoom(room internal.Room) *models.ApiError {
 
 	return internal.NewError(models.M_BAD_STATE, "you are not a member of group") // TODO: check error code
 }
+
+func (user *User) SendMessage(room internal.Room, text string) *models.ApiError {
+	room.(*Room).mutex.Lock()
+	defer room.(*Room).mutex.Unlock()
+
+	userInRoom := false
+	for _, roomMember := range room.(*Room).joined {
+		if roomMember.ID() == user.ID() {
+			userInRoom = true
+		}
+	}
+
+	if !userInRoom {
+		return internal.NewError(models.M_FORBIDDEN, "")
+	}
+
+	room.(*Room).events = append(room.(*Room).events, RoomEvent{
+		Content:        nil,
+		Type:           rooms.Message,
+		EventID:        newToken(defaultTokenSize),
+		Sender:         user,
+		OriginServerTS: time.Now(),
+		Room:           room})
+
+	return nil
+}

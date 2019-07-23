@@ -31,4 +31,5 @@ type User interface {
 	CreateRoom(request createroom.Request) (Room, *models.ApiError)
 	LeaveRoom(room Room) *models.ApiError
 	SetTopic(room Room, topic string) *models.ApiError
+	SendMessage(room Room, text string) *models.ApiError
 }
