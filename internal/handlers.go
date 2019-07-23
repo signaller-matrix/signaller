@@ -15,6 +15,7 @@ import (
 	register "github.com/nxshock/signaller/internal/models/register"
 	mSync "github.com/nxshock/signaller/internal/models/sync"
 	"github.com/nxshock/signaller/internal/models/versions"
+	"github.com/nxshock/signaller/internal/models/whoami"
 )
 
 func RootHandler(w http.ResponseWriter, r *http.Request) {
@@ -122,6 +123,20 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	response.UserID = "@" + request.Username
 	response.DeviceID = request.DeviceID
 	response.AccessToken = token
+
+	sendJsonResponse(w, http.StatusOK, response)
+}
+
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-account-whoami
+func WhoAmIHandler(w http.ResponseWriter, r *http.Request) {
+	token := getTokenFromResponse(r)
+	if token == "" {
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+
+	response := whoami.Response{UserID: user.ID()}
 
 	sendJsonResponse(w, http.StatusOK, response)
 }

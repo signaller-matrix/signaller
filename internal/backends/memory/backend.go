@@ -91,3 +91,18 @@ func (backend *Backend) Sync(token string, request mSync.SyncRequest) (response 
 
 	return nil, nil // TODO: implement
 }
+
+func (backend *Backend) GetUserByToken(token string) internal.User {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
+
+	for _, user := range backend.data {
+		for userToken := range user.(*User).Tokens {
+			if userToken == token {
+				return user
+			}
+		}
+	}
+
+	return nil
+}
