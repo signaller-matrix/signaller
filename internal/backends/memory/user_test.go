@@ -58,3 +58,25 @@ func TestUserMessageInWrongRoom(t *testing.T) {
 	err = user2.SendMessage(room, "hello")
 	assert.NotNil(t, err)
 }
+
+func TestGetUserByToken(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user, token, err := backend.Register("user1", "", "")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, token)
+
+	gotUser := backend.GetUserByToken(token)
+	assert.Equal(t, user, gotUser)
+}
+
+func TestGetUserByWrongToken(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	_, token, err := backend.Register("user1", "", "")
+	assert.Nil(t, err)
+	assert.NotEmpty(t, token)
+
+	gotUser := backend.GetUserByToken("wrong token")
+	assert.Nil(t, gotUser)
+}
