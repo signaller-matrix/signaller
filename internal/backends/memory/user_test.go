@@ -80,3 +80,21 @@ func TestGetUserByWrongToken(t *testing.T) {
 	gotUser := backend.GetUserByToken("wrong token")
 	assert.Nil(t, gotUser)
 }
+
+func TestLogoutWithWrongToken(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	var (
+		userName = "user1"
+		password = "password1"
+	)
+
+	user, _, err := backend.Register(userName, password, "")
+	assert.Nil(t, err)
+
+	token, err := backend.Login(userName, password, "")
+	assert.Nil(t, err)
+	assert.NotZero(t, token)
+
+	user.Logout("worng token")
+}

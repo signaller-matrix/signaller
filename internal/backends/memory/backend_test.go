@@ -87,21 +87,3 @@ func TestLogout(t *testing.T) {
 
 	user.Logout(token)
 }
-
-func TestLogoutWithWrongToken(t *testing.T) {
-	backend := NewBackend("localhost")
-
-	var (
-		userName = "user1"
-		password = "password1"
-	)
-
-	user, _, err := backend.Register(userName, password, "")
-	assert.Nil(t, err)
-
-	token, err := backend.Login(userName, password, "")
-	assert.Nil(t, err)
-	assert.NotZero(t, token)
-
-	user.Logout("worng token")
-}
