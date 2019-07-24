@@ -88,11 +88,13 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiErr := currServer.Backend.Logout(token)
-	if apiErr != nil {
-		errorResponse(w, *apiErr, http.StatusBadRequest, "") // TODO: check code
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
 		return
 	}
+
+	user.Logout(token)
 
 	sendJsonResponse(w, http.StatusOK, struct{}{})
 }

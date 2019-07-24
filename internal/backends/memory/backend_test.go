@@ -78,15 +78,14 @@ func TestLogout(t *testing.T) {
 		password = "password1"
 	)
 
-	_, _, err := backend.Register(userName, password, "")
+	user, _, err := backend.Register(userName, password, "")
 	assert.Nil(t, err)
 
 	token, err := backend.Login(userName, password, "")
 	assert.Nil(t, err)
 	assert.NotZero(t, token)
 
-	err = backend.Logout(token)
-	assert.Nil(t, err)
+	user.Logout(token)
 }
 
 func TestLogoutWithWrongToken(t *testing.T) {
@@ -97,13 +96,12 @@ func TestLogoutWithWrongToken(t *testing.T) {
 		password = "password1"
 	)
 
-	_, _, err := backend.Register(userName, password, "")
+	user, _, err := backend.Register(userName, password, "")
 	assert.Nil(t, err)
 
 	token, err := backend.Login(userName, password, "")
 	assert.Nil(t, err)
 	assert.NotZero(t, token)
 
-	err = backend.Logout("worng token")
-	assert.NotNil(t, err)
+	user.Logout("worng token")
 }

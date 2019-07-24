@@ -69,22 +69,6 @@ func (backend *Backend) Login(username, password, device string) (token string, 
 	return token, nil
 }
 
-func (backend *Backend) Logout(token string) *models.ApiError {
-	backend.mutex.Lock()
-	defer backend.mutex.Unlock()
-
-	for _, user := range backend.data {
-		for userToken, _ := range user.(*User).Tokens {
-			if userToken == token {
-				delete(user.(*User).Tokens, token)
-				return nil
-			}
-		}
-	}
-
-	return internal.NewError(models.M_UNKNOWN_TOKEN, "unknown token") // TODO: create error struct
-}
-
 func (backend *Backend) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err *models.ApiError) {
 	backend.mutex.Lock()
 	defer backend.mutex.Unlock()

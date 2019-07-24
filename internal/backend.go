@@ -10,7 +10,6 @@ import (
 type Backend interface {
 	Register(username, password, device string) (user User, token string, err *models.ApiError)
 	Login(username, password, device string) (token string, err *models.ApiError)
-	Logout(token string) *models.ApiError
 	GetUserByToken(token string) (user User)
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err *models.ApiError)
 }
@@ -33,5 +32,6 @@ type User interface {
 	LeaveRoom(room Room) *models.ApiError
 	SetTopic(room Room, topic string) *models.ApiError
 	SendMessage(room Room, text string) *models.ApiError
+	Logout(token string)
 	LogoutAll()
 }

@@ -155,6 +155,10 @@ func (user *User) SendMessage(room internal.Room, text string) *models.ApiError 
 	return nil
 }
 
+func (user *User) Logout(token string) {
+	delete(user.Tokens, token)
+}
+
 func (user *User) LogoutAll() {
 	user.Tokens = make(map[string]Token)
 }
