@@ -11,6 +11,7 @@ import (
 	"github.com/nxshock/signaller/internal/models/common"
 
 	"github.com/nxshock/signaller/internal/models"
+	"github.com/nxshock/signaller/internal/models/joinedrooms"
 	login "github.com/nxshock/signaller/internal/models/login"
 	register "github.com/nxshock/signaller/internal/models/register"
 	mSync "github.com/nxshock/signaller/internal/models/sync"
@@ -164,6 +165,34 @@ func WhoAmIHandler(w http.ResponseWriter, r *http.Request) {
 	user := currServer.Backend.GetUserByToken(token)
 
 	response := whoami.Response{UserID: user.ID()}
+
+	sendJsonResponse(w, http.StatusOK, response)
+}
+
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-joined-rooms
+func JoinedRoomsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+	token := getTokenFromResponse(r)
+	if token == "" {
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	rooms := user.JoinedRooms()
+
+	var response joinedrooms.Response
+	for _, room := range rooms {
+		response.JoinedRooms = append(response.JoinedRooms, room.ID())
+	}
 
 	sendJsonResponse(w, http.StatusOK, response)
 }

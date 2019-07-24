@@ -85,7 +85,8 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 		topic:     request.Topic,
 		events:    events,
 		creator:   user,
-		joined:    []internal.User{user}}
+		joined:    []internal.User{user},
+		server:    user.backend}
 
 	for i, _ := range room.events {
 		room.events[i].Room = room
@@ -153,6 +154,23 @@ func (user *User) SendMessage(room internal.Room, text string) *models.ApiError 
 		Room:           room})
 
 	return nil
+}
+
+func (user *User) JoinedRooms() []internal.Room {
+	user.backend.mutex.Lock()
+	defer user.backend.mutex.Unlock()
+
+	var result []internal.Room
+
+	for _, room := range user.backend.rooms {
+		for _, user := range room.(*Room).joined {
+			if user.ID() == user.ID() {
+				result = append(result, room)
+			}
+		}
+	}
+
+	return result
 }
 
 func (user *User) Logout(token string) {

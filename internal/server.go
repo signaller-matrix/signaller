@@ -24,6 +24,7 @@ func New() *Server {
 	router.HandleFunc("/_matrix/client/r0/logout/all", LogoutAllHandler)
 	router.HandleFunc("/_matrix/client/r0/register", RegisterHandler)
 	router.HandleFunc("/_matrix/client/r0/account/whoami", WhoAmIHandler)
+	router.HandleFunc("/_matrix/client/r0/joined_rooms", JoinedRoomsHandler)
 	router.HandleFunc("/_matrix/client/r0/sync", SyncHandler)
 	router.HandleFunc("/", RootHandler)
 

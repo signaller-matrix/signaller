@@ -3,6 +3,8 @@ package memory
 import (
 	"testing"
 
+	"github.com/nxshock/signaller/internal"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/nxshock/signaller/internal/models/createroom"
@@ -97,4 +99,22 @@ func TestLogoutWithWrongToken(t *testing.T) {
 	assert.NotZero(t, token)
 
 	user.Logout("worng token")
+}
+
+func TestJoinedRooms(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user, _, err := backend.Register("user1", "", "")
+	assert.Nil(t, err)
+
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1",
+		Topic:         "topic"}
+
+	room, err := user.CreateRoom(request)
+	assert.Nil(t, err)
+
+	rooms := user.JoinedRooms()
+	assert.Equal(t, []internal.Room{room}, rooms)
 }
