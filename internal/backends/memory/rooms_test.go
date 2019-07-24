@@ -26,6 +26,7 @@ func TestCreateRoom(t *testing.T) {
 	assert.Equal(t, request.Topic, room.Topic())
 	assert.Equal(t, user.ID(), room.Creator().ID())
 	assert.Equal(t, 1, len(backend.rooms))
+	assert.Equal(t, "!"+room.(*Room).id+":"+backend.hostname, room.ID())
 }
 
 func TestCreateAlreadyExistingRoom(t *testing.T) {

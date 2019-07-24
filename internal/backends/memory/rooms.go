@@ -20,6 +20,8 @@ type Room struct {
 
 	events []RoomEvent
 
+	server *Backend
+
 	mutex sync.RWMutex
 }
 
@@ -27,7 +29,7 @@ func (room *Room) ID() string {
 	room.mutex.RLock()
 	defer room.mutex.RUnlock()
 
-	return room.id
+	return "!" + room.id + ":" + room.server.hostname
 }
 
 func (room *Room) Name() string {
