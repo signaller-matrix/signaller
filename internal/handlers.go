@@ -97,6 +97,31 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonResponse(w, http.StatusOK, struct{}{})
 }
 
+// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-logout-all
+func LogoutAllHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+	token := getTokenFromResponse(r)
+
+	if token == "" {
+		errorResponse(w, models.M_MISSING_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	user.LogoutAll()
+
+	sendJsonResponse(w, http.StatusOK, struct{}{})
+}
+
 // https://models.org/docs/spec/client_server/latest#post-models-client-r0-register
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
