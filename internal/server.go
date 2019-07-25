@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+
+	"github.com/nxshock/signaller/internal/models/capabilities"
 )
 
 var currServer *Server
@@ -13,7 +15,9 @@ type Server struct {
 	router     *mux.Router
 
 	Address string
-	Backend Backend
+
+	Capabilities capabilities.Capabilities
+	Backend      Backend
 }
 
 func New() *Server {
@@ -26,6 +30,7 @@ func New() *Server {
 	router.HandleFunc("/_matrix/client/r0/account/whoami", WhoAmIHandler)
 	router.HandleFunc("/_matrix/client/r0/joined_rooms", JoinedRoomsHandler)
 	router.HandleFunc("/_matrix/client/r0/sync", SyncHandler)
+	router.HandleFunc("/_matrix/client/r0/capabilities", CapabilitiesHandler)
 	router.HandleFunc("/", RootHandler)
 
 	httpServer := new(http.Server)

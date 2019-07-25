@@ -11,6 +11,7 @@ import (
 	"github.com/nxshock/signaller/internal/models/common"
 
 	"github.com/nxshock/signaller/internal/models"
+	"github.com/nxshock/signaller/internal/models/capabilities"
 	"github.com/nxshock/signaller/internal/models/joinedrooms"
 	login "github.com/nxshock/signaller/internal/models/login"
 	register "github.com/nxshock/signaller/internal/models/register"
@@ -220,6 +221,30 @@ func SyncHandler(w http.ResponseWriter, r *http.Request) {
 
 	response.NextBatch = "123"
 	response.Rooms = mSync.RoomsSyncReply{}
+
+	sendJsonResponse(w, http.StatusOK, response)
+}
+
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-capabilities
+func CapabilitiesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+	token := getTokenFromResponse(r)
+	if token == "" {
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	var response capabilities.Response
+	response.Capabilities = currServer.Capabilities
 
 	sendJsonResponse(w, http.StatusOK, response)
 }
