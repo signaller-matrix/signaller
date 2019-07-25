@@ -33,6 +33,7 @@ type User interface {
 	SetTopic(room Room, topic string) *models.ApiError
 	SendMessage(room Room, text string) *models.ApiError
 	JoinedRooms() []Room
+	ChangePassword(newPassword string)
 	Logout(token string)
 	LogoutAll()
 }

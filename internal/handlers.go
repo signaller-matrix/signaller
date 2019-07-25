@@ -14,6 +14,7 @@ import (
 	"github.com/nxshock/signaller/internal/models/capabilities"
 	"github.com/nxshock/signaller/internal/models/joinedrooms"
 	login "github.com/nxshock/signaller/internal/models/login"
+	"github.com/nxshock/signaller/internal/models/password"
 	register "github.com/nxshock/signaller/internal/models/register"
 	mSync "github.com/nxshock/signaller/internal/models/sync"
 	"github.com/nxshock/signaller/internal/models/versions"
@@ -196,6 +197,32 @@ func JoinedRoomsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sendJsonResponse(w, http.StatusOK, response)
+}
+
+// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-account-password
+func PasswordHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+	token := getTokenFromResponse(r)
+	if token == "" {
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	var request password.Request
+	getRequest(r, &request) // TODO: handle error
+
+	user.ChangePassword(request.NewPassword)
+
+	sendJsonResponse(w, http.StatusOK, struct{}{})
 }
 
 // https://models.org/docs/spec/client_server/latest#get-models-client-r0-sync

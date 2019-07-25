@@ -118,3 +118,15 @@ func TestJoinedRooms(t *testing.T) {
 	rooms := user.JoinedRooms()
 	assert.Equal(t, []internal.Room{room}, rooms)
 }
+
+func TestNewPassword(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	var newPassword = "new password"
+
+	user, _, err := backend.Register("user1", "old password", "")
+	assert.Nil(t, err)
+
+	user.ChangePassword(newPassword)
+	assert.Equal(t, newPassword, user.Password())
+}

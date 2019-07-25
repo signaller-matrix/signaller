@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"sync"
 	"time"
 
 	"github.com/nxshock/signaller/internal"
@@ -15,6 +16,8 @@ type User struct {
 	Tokens   map[string]Token
 
 	backend *Backend
+
+	mutex sync.RWMutex
 }
 
 func (user *User) ID() string {
@@ -171,6 +174,13 @@ func (user *User) JoinedRooms() []internal.Room {
 	}
 
 	return result
+}
+
+func (user *User) ChangePassword(newPassword string) {
+	user.mutex.Lock()
+	defer user.mutex.Unlock()
+
+	user.password = newPassword
 }
 
 func (user *User) Logout(token string) {
