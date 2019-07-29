@@ -37,6 +37,7 @@ func NewServer(port int) (*Server, error) {
 	router.HandleFunc("/_matrix/client/r0/account/password", PasswordHandler)
 	router.HandleFunc("/_matrix/client/r0/sync", SyncHandler)
 	router.HandleFunc("/_matrix/client/r0/capabilities", CapabilitiesHandler)
+	router.HandleFunc("/_matrix/client/r0/devices", DevicesHandler)
 	router.HandleFunc("/", RootHandler)
 
 	if port <= 0 || port > 65535 {

@@ -7,6 +7,7 @@ import (
 	"github.com/nxshock/signaller/internal"
 	"github.com/nxshock/signaller/internal/models"
 	"github.com/nxshock/signaller/internal/models/createroom"
+	"github.com/nxshock/signaller/internal/models/devices"
 	"github.com/nxshock/signaller/internal/models/rooms"
 )
 
@@ -171,6 +172,22 @@ func (user *User) JoinedRooms() []internal.Room {
 				result = append(result, room)
 			}
 		}
+	}
+
+	return result
+}
+
+func (user *User) Devices() []devices.Device {
+	user.backend.mutex.Lock()
+	defer user.backend.mutex.Unlock()
+
+	var result []devices.Device
+
+	for _, token := range user.Tokens {
+		device := devices.Device{
+			DeviceID: token.Device}
+
+		result = append(result, device)
 	}
 
 	return result

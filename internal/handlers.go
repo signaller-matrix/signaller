@@ -276,6 +276,15 @@ func CapabilitiesHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-devices
+func DevicesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+}
+
 func sendJsonResponse(w http.ResponseWriter, httpStatus int, data interface{}) error {
 	b, err := json.Marshal(data)
 	if err != nil {

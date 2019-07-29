@@ -130,3 +130,16 @@ func TestNewPassword(t *testing.T) {
 	user.ChangePassword(newPassword)
 	assert.Equal(t, newPassword, user.Password())
 }
+
+func TestDevices(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	var expectedDeviceID = "my device"
+
+	user, _, err := backend.Register("user1", "", expectedDeviceID)
+	assert.Nil(t, err)
+
+	devices := user.Devices()
+	assert.Len(t, devices, 1)
+	assert.Equal(t, expectedDeviceID, devices[0].DeviceID)
+}

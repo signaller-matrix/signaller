@@ -3,6 +3,7 @@ package internal
 import (
 	"github.com/nxshock/signaller/internal/models"
 	"github.com/nxshock/signaller/internal/models/createroom"
+	"github.com/nxshock/signaller/internal/models/devices"
 	"github.com/nxshock/signaller/internal/models/rooms"
 	"github.com/nxshock/signaller/internal/models/sync"
 )
@@ -34,6 +35,7 @@ type User interface {
 	SendMessage(room Room, text string) *models.ApiError
 	JoinedRooms() []Room
 	ChangePassword(newPassword string)
+	Devices() []devices.Device
 	Logout(token string)
 	LogoutAll()
 }
