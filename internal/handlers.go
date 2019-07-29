@@ -161,10 +161,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 func WhoAmIHandler(w http.ResponseWriter, r *http.Request) {
 	token := getTokenFromResponse(r)
 	if token == "" {
-		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+		errorResponse(w, models.M_MISSING_TOKEN, http.StatusForbidden, "")
+		return
 	}
 
 	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusForbidden, "")
+	}
 
 	response := whoami.Response{UserID: user.ID()}
 
