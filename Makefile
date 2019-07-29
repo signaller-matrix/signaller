@@ -1,4 +1,6 @@
-all: install test
+all: 
+	cd cmd; \
+	go build -o ../signaller;
 
 install:
 	go install github.com/nxshock/signaller/cmd
