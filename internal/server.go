@@ -5,6 +5,10 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"errors"
+
+	"strconv"
+
 	"github.com/nxshock/signaller/internal/models/capabilities"
 )
 
@@ -20,7 +24,8 @@ type Server struct {
 	Backend      Backend
 }
 
-func New() *Server {
+func NewServer(port int) (*Server, error) {
+
 	router := mux.NewRouter()
 	router.HandleFunc("/_matrix/client/versions", VersionHandler)
 	router.HandleFunc("/_matrix/client/r0/login", LoginHandler)
@@ -34,8 +39,12 @@ func New() *Server {
 	router.HandleFunc("/_matrix/client/r0/capabilities", CapabilitiesHandler)
 	router.HandleFunc("/", RootHandler)
 
+	if port <= 0 || port > 65535 {
+		return nil, errors.New("invalid port number")
+	}
+
 	httpServer := new(http.Server)
-	httpServer.Addr = ":8008"
+	httpServer.Addr = ":" + strconv.Itoa(port)
 	httpServer.Handler = router
 
 	server := &Server{
@@ -43,7 +52,7 @@ func New() *Server {
 		router:     router}
 
 	currServer = server
-	return server
+	return server, nil
 }
 
 func (server *Server) Run() error {
