@@ -86,4 +86,6 @@ func TestLogout(t *testing.T) {
 	assert.NotZero(t, token)
 
 	user.Logout(token)
+
+	assert.Nil(t, backend.GetUserByToken(token))
 }
