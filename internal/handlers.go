@@ -168,6 +168,7 @@ func WhoAmIHandler(w http.ResponseWriter, r *http.Request) {
 	user := currServer.Backend.GetUserByToken(token)
 	if user == nil {
 		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusForbidden, "")
+		return
 	}
 
 	response := whoami.Response{UserID: user.ID()}
