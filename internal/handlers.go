@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nxshock/signaller/internal/models/devices"
+
 	"github.com/gorilla/mux"
 
 	"github.com/nxshock/signaller/internal/models/common"
@@ -293,6 +295,22 @@ func DevicesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	token := getTokenFromResponse(r)
+	if token == "" {
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+		return
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	var response devices.Response
+	response.Devices = user.Devices()
+
+	sendJsonResponse(w, http.StatusOK, response)
 }
 
 // https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-directory-list-room-roomid
