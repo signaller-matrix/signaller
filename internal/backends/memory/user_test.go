@@ -163,4 +163,12 @@ func TestSetRoomVisibility(t *testing.T) {
 	err = user.SetRoomVisibility(room, createroom.VisibilityTypePublic)
 	assert.Nil(t, err)
 	assert.Equal(t, createroom.VisibilityTypePublic, room.Visibility())
+
+	// TODO: Only owner can change room visibility
+	notOwnerUser, _, err := backend.Register("user2", "", "")
+	assert.Nil(t, err)
+
+	err = notOwnerUser.SetRoomVisibility(room, createroom.VisibilityTypePrivate)
+	assert.NotNil(t, err)
+	assert.NotEqual(t, createroom.VisibilityTypePrivate, room.Visibility())
 }
