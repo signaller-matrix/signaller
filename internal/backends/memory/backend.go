@@ -28,45 +28,42 @@ func NewBackend(hostname string) *Backend {
 
 func (backend *Backend) Register(username, password, device string) (user internal.User, token string, err *models.ApiError) {
 	backend.mutex.Lock()
-	defer backend.mutex.Unlock()
 
 	if _, ok := backend.data[username]; ok {
+		backend.mutex.Unlock()
 		return nil, "", internal.NewError(models.M_USER_IN_USE, "trying to register a user ID which has been taken")
 	}
-
-	token = newToken(defaultTokenSize)
 
 	user = &User{
 		name:     username,
 		password: password,
-		Tokens: map[string]Token{
-			token: {
-				Device: device}},
-		backend: backend}
+		Tokens:   make(map[string]Token),
+		backend:  backend}
 
 	backend.data[username] = user
 
-	return user, token, nil
+	backend.mutex.Unlock()
+	return backend.Login(username, password, device)
 }
 
-func (backend *Backend) Login(username, password, device string) (token string, err *models.ApiError) {
+func (backend *Backend) Login(username, password, device string) (user internal.User, token string, err *models.ApiError) {
 	backend.mutex.Lock()
 	defer backend.mutex.Unlock()
 
 	user, ok := backend.data[username]
 	if !ok {
-		return "", internal.NewError(models.M_FORBIDDEN, "wrong username")
+		return nil, "", internal.NewError(models.M_FORBIDDEN, "wrong username")
 	}
 
 	if user.Password() != password {
-		return "", internal.NewError(models.M_FORBIDDEN, "wrong password")
+		return nil, "", internal.NewError(models.M_FORBIDDEN, "wrong password")
 	}
 
 	token = newToken(defaultTokenSize)
 
 	backend.data[username].(*User).Tokens[token] = Token{Device: device}
 
-	return token, nil
+	return user, token, nil
 }
 
 func (backend *Backend) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err *models.ApiError) {

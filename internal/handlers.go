@@ -66,7 +66,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 				request.Identifier.User = strings.TrimPrefix(request.Identifier.User, "@")
 			}
 
-			token, apiErr := currServer.Backend.Login(request.Identifier.User, request.Password, request.DeviceID)
+			_, token, apiErr := currServer.Backend.Login(request.Identifier.User, request.Password, request.DeviceID)
 			if apiErr != nil {
 				errorResponse(w, *apiErr, http.StatusForbidden, "")
 				return

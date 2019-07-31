@@ -49,7 +49,7 @@ func TestLogin(t *testing.T) {
 	_, _, err := backend.Register(userName, password, "")
 	assert.Nil(t, err)
 
-	token, err := backend.Login(userName, password, "")
+	_, token, err := backend.Login(userName, password, "")
 	assert.Nil(t, err)
 	assert.NotZero(t, token)
 }
@@ -65,10 +65,10 @@ func TestLoginWithWrongCredentials(t *testing.T) {
 	_, _, err := backend.Register(userName, password, "")
 	assert.Nil(t, err)
 
-	_, err = backend.Login(userName, "wrong password", "")
+	_, _, err = backend.Login(userName, "wrong password", "")
 	assert.NotNil(t, err)
 
-	_, err = backend.Login("wrong user name", password, "")
+	_, _, err = backend.Login("wrong user name", password, "")
 	assert.NotNil(t, err)
 }
 
@@ -83,7 +83,7 @@ func TestLogout(t *testing.T) {
 	user, _, err := backend.Register(userName, password, "")
 	assert.Nil(t, err)
 
-	token, err := backend.Login(userName, password, "")
+	_, token, err := backend.Login(userName, password, "")
 	assert.Nil(t, err)
 	assert.NotZero(t, token)
 

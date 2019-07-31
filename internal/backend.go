@@ -10,7 +10,7 @@ import (
 
 type Backend interface {
 	Register(username, password, device string) (user User, token string, err *models.ApiError)
-	Login(username, password, device string) (token string, err *models.ApiError)
+	Login(username, password, device string) (user User, token string, err *models.ApiError)
 	GetUserByToken(token string) (user User)
 	GetRoomByID(id string) Room
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err *models.ApiError)
