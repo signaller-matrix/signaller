@@ -108,4 +108,8 @@ func TestGetRoomByID(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, room)
 	assert.Equal(t, room.ID(), backend.GetRoomByID(room.ID()).ID())
+
+	// Get room with wrong id
+	room = backend.GetRoomByID("worng id")
+	assert.Nil(t, room)
 }
