@@ -10,7 +10,7 @@ import (
 
 type Room struct {
 	id         string
-	Visibility createroom.VisibilityType
+	visibility createroom.VisibilityType
 	aliasName  string
 	name       string
 	topic      string
@@ -70,6 +70,13 @@ func (room *Room) Events() []rooms.Event {
 	}
 
 	return result
+}
+
+func (room *Room) Visibility() createroom.VisibilityType {
+	room.mutex.RLock()
+	defer room.mutex.RUnlock()
+
+	return room.visibility
 }
 
 func (room *Room) Creator() internal.User {

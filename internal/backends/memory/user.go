@@ -83,21 +83,22 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 	}
 
 	room := &Room{
-		id:        newToken(groupIDSize),
-		aliasName: request.RoomAliasName,
-		name:      request.Name,
-		topic:     request.Topic,
-		events:    events,
-		creator:   user,
-		joined:    []internal.User{user},
-		server:    user.backend}
+		id:         newToken(groupIDSize),
+		aliasName:  request.RoomAliasName,
+		name:       request.Name,
+		topic:      request.Topic,
+		events:     events,
+		creator:    user,
+		joined:     []internal.User{user},
+		visibility: request.Visibility,
+		server:     user.backend}
 
 	for i, _ := range room.events {
 		room.events[i].Room = room
 		//v.Room = room
 	}
 
-	user.backend.rooms[room.id] = room
+	user.backend.rooms[room.ID()] = room
 
 	return room, nil
 }
@@ -191,6 +192,19 @@ func (user *User) Devices() []devices.Device {
 	}
 
 	return result
+}
+
+func (user *User) SetRoomVisibility(room internal.Room, visibilityType createroom.VisibilityType) *models.ApiError {
+	if user.ID() != room.Creator().ID() {
+		return internal.NewError(models.M_FORBIDDEN, "only room owner can change visibility") // TODO: room administrators can use this method too
+	}
+
+	room.(*Room).mutex.Lock()
+	defer room.(*Room).mutex.Unlock()
+
+	room.(*Room).visibility = visibilityType
+
+	return nil
 }
 
 func (user *User) ChangePassword(newPassword string) {

@@ -90,3 +90,16 @@ func (backend *Backend) GetUserByToken(token string) internal.User {
 
 	return nil
 }
+
+func (backend *Backend) GetRoomByID(id string) internal.Room {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
+
+	for roomID, room := range backend.rooms {
+		if roomID == id {
+			return room
+		}
+	}
+
+	return nil
+}

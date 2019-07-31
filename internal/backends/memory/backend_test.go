@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/nxshock/signaller/internal/models/createroom"
 )
 
 func TestRegisterUser(t *testing.T) {
@@ -88,4 +90,22 @@ func TestLogout(t *testing.T) {
 	user.Logout(token)
 
 	assert.Nil(t, backend.GetUserByToken(token))
+}
+
+func TestGetRoomByID(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user, token, err := backend.Register("user", "", "")
+	assert.Nil(t, err)
+	assert.NotNil(t, user)
+	assert.NotEmpty(t, token)
+
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1"}
+
+	room, err := user.CreateRoom(request)
+	assert.Nil(t, err)
+	assert.NotNil(t, room)
+	assert.Equal(t, room.ID(), backend.GetRoomByID(room.ID()).ID())
 }

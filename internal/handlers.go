@@ -8,11 +8,14 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gorilla/mux"
+
 	"github.com/nxshock/signaller/internal/models/common"
 
 	"github.com/nxshock/signaller/internal/models"
 	"github.com/nxshock/signaller/internal/models/capabilities"
 	"github.com/nxshock/signaller/internal/models/joinedrooms"
+	"github.com/nxshock/signaller/internal/models/listroom"
 	login "github.com/nxshock/signaller/internal/models/login"
 	"github.com/nxshock/signaller/internal/models/password"
 	register "github.com/nxshock/signaller/internal/models/register"
@@ -288,6 +291,48 @@ func DevicesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-directory-list-room-roomid
+// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-directory-list-room-roomid
+func listRoomHandler(w http.ResponseWriter, r *http.Request) {
+	room := currServer.Backend.GetRoomByID(mux.Vars(r)["roomID"]) // TODO: can ["roomID"] throw panic?
+	if room == nil {
+		errorResponse(w, models.M_NOT_FOUND, http.StatusBadRequest, "room not found")
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		response := listroom.Response{
+			Visibility: room.Visibility()}
+
+		sendJsonResponse(w, http.StatusOK, response)
+	case http.MethodPut:
+		token := getTokenFromResponse(r)
+		if token == "" {
+			errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+			return
+		}
+
+		user := currServer.Backend.GetUserByToken(token)
+		if user == nil {
+			errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+			return
+		}
+
+		var request listroom.Request
+		err := getRequest(r, &request)
+		if err != nil {
+			errorResponse(w, models.M_BAD_JSON, http.StatusBadRequest, err.Error())
+			return
+		}
+		user.SetRoomVisibility(room, request.Visibility)
+
+		sendJsonResponse(w, http.StatusOK, struct{}{})
+	default:
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+	}
 }
 
 func sendJsonResponse(w http.ResponseWriter, httpStatus int, data interface{}) error {

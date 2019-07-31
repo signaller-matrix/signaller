@@ -11,4 +11,6 @@ Implemented from [Client-Server API](https://matrix.org/docs/spec/client_server/
 - [x] [5.7.1 GET /_matrix/client/r0/account/whoami](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-account-whoami)
 - [x] [6.1 GET /_matrix/client/r0/capabilities](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-capabilities)
 - [x] [10.4.1 GET /_matrix/client/r0/joined_rooms](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-joined-rooms)
+- [x] [10.5.1 GET /_matrix/client/r0/directory/list/room/{roomId}](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-directory-list-room-roomid)
+- [x] [10.5.2 PUT /_matrix/client/r0/directory/list/room/{roomId}](https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-directory-list-room-roomid)
 - [x] [13.10.1.1 GET /_matrix/client/r0/devices](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-devices)

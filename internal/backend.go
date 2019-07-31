@@ -12,6 +12,7 @@ type Backend interface {
 	Register(username, password, device string) (user User, token string, err *models.ApiError)
 	Login(username, password, device string) (token string, err *models.ApiError)
 	GetUserByToken(token string) (user User)
+	GetRoomByID(id string) Room
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err *models.ApiError)
 }
 
@@ -23,6 +24,7 @@ type Room interface {
 	Name() string
 	Topic() string
 	Events() []rooms.Event
+	Visibility() createroom.VisibilityType
 }
 
 type User interface {
@@ -36,6 +38,7 @@ type User interface {
 	JoinedRooms() []Room
 	ChangePassword(newPassword string)
 	Devices() []devices.Device
+	SetRoomVisibility(Room, createroom.VisibilityType) *models.ApiError
 	Logout(token string)
 	LogoutAll()
 }

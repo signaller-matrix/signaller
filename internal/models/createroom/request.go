@@ -9,7 +9,7 @@ type VisibilityType string
 
 const (
 	VisibilityTypePrivate VisibilityType = "private"
-	VisibilityTypePublic                 = "public"
+	VisibilityTypePublic  VisibilityType = "public"
 )
 
 type Preset string

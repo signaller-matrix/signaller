@@ -1,13 +1,11 @@
 package internal
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
-
-	"errors"
-
-	"strconv"
 
 	"github.com/nxshock/signaller/internal/models/capabilities"
 )
@@ -38,6 +36,7 @@ func NewServer(port int) (*Server, error) {
 	router.HandleFunc("/_matrix/client/r0/sync", SyncHandler)
 	router.HandleFunc("/_matrix/client/r0/capabilities", CapabilitiesHandler)
 	router.HandleFunc("/_matrix/client/r0/devices", DevicesHandler)
+	router.HandleFunc("/_matrix/client/r0/directory/list/room/{roomID}", listRoomHandler)
 	router.HandleFunc("/", RootHandler)
 
 	if port <= 0 || port > 65535 {
