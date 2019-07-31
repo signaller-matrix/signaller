@@ -189,6 +189,7 @@ func JoinedRoomsHandler(w http.ResponseWriter, r *http.Request) {
 	token := getTokenFromResponse(r)
 	if token == "" {
 		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+		return
 	}
 
 	user := currServer.Backend.GetUserByToken(token)
@@ -217,6 +218,7 @@ func PasswordHandler(w http.ResponseWriter, r *http.Request) {
 	token := getTokenFromResponse(r)
 	if token == "" {
 		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+		return
 	}
 
 	user := currServer.Backend.GetUserByToken(token)
@@ -244,7 +246,6 @@ func SyncHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	request.Timeout = timeout
-	//log.Printf("%+v", request)
 
 	token := getTokenFromResponse(r)
 	if token == "" {
@@ -270,6 +271,7 @@ func CapabilitiesHandler(w http.ResponseWriter, r *http.Request) {
 	token := getTokenFromResponse(r)
 	if token == "" {
 		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+		return
 	}
 
 	user := currServer.Backend.GetUserByToken(token)
