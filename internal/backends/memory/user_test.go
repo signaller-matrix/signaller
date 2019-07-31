@@ -172,3 +172,24 @@ func TestSetRoomVisibility(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.NotEqual(t, createroom.VisibilityTypePrivate, room.Visibility())
 }
+
+func TestLogoutAll(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	var (
+		userName = "user1"
+		password = "password1"
+	)
+
+	user, _, err := backend.Register(userName, password, "dev1")
+	assert.Nil(t, err)
+	assert.Len(t, user.Devices(), 1)
+
+	_, err = backend.Login(userName, password, "dev2")
+	assert.Nil(t, err)
+	assert.Len(t, user.Devices(), 2)
+
+	user.LogoutAll()
+
+	assert.Len(t, user.Devices(), 0)
+}
