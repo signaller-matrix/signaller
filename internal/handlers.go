@@ -82,6 +82,41 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-leave
+func leaveRoomHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+	token := getTokenFromResponse(r)
+
+	if token == "" {
+		errorResponse(w, models.M_MISSING_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	room := currServer.Backend.GetRoomByID(mux.Vars(r)["roomID"]) // TODO: can ["roomID"] throw panic?
+	if room == nil {
+		errorResponse(w, models.M_NOT_FOUND, http.StatusBadRequest, "room not found")
+		return
+	}
+
+	err := user.LeaveRoom(room)
+	if err != nil {
+		errorResponse(w, *err, http.StatusBadRequest, "")
+		return
+	}
+
+	sendJsonResponse(w, http.StatusOK, struct{}{})
+}
+
 // https://models.org/docs/spec/client_server/latest#post-models-client-r0-logout
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
