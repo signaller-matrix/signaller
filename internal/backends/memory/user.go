@@ -222,3 +222,20 @@ func (user *User) Logout(token string) {
 func (user *User) LogoutAll() {
 	user.Tokens = make(map[string]Token)
 }
+
+func (user *User) JoinRoom(room internal.Room) *models.ApiError {
+	memRoom := room.(*Room)
+
+	memRoom.mutex.Lock()
+	defer memRoom.mutex.Unlock()
+
+	for _, roomUser := range memRoom.joined {
+		if roomUser.ID() == user.ID() {
+			return internal.NewError(models.M_BAD_STATE, "user already in room") // TODO: check code
+		}
+	}
+
+	memRoom.joined = append(memRoom.joined, user)
+
+	return nil
+}

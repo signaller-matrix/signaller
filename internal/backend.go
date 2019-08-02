@@ -47,4 +47,5 @@ type User interface {
 	SetRoomVisibility(Room, createroom.VisibilityType) *models.ApiError
 	Logout(token string)
 	LogoutAll()
+	JoinRoom(Room) *models.ApiError
 }

@@ -136,3 +136,44 @@ func TestGetUserByName(t *testing.T) {
 		assert.Nil(t, user2)
 	})
 }
+
+func TestPublicRooms(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user1, _, err := backend.Register("user1", "", "")
+	assert.Nil(t, err)
+	assert.NotNil(t, user1)
+
+	// Create first room
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1",
+		Preset:        createroom.PublicChat}
+
+	room1, err := user1.CreateRoom(request)
+	assert.Nil(t, err)
+	assert.NotNil(t, room1)
+
+	// Create second room
+	request = createroom.Request{
+		RoomAliasName: "room2",
+		Name:          "room2",
+		Preset:        createroom.PublicChat}
+
+	room2, err := user1.CreateRoom(request)
+	assert.Nil(t, err)
+	assert.NotNil(t, room2)
+
+	// Make room2 has 2 users
+	user2, _, err := backend.Register("user2", "", "")
+	assert.Nil(t, err)
+	assert.NotNil(t, user2)
+
+	err = user2.JoinRoom(room2)
+	assert.Nil(t, err)
+
+	rooms := backend.PublicRooms()
+	assert.Len(t, rooms, 2)
+	assert.Equal(t, rooms[0], room2)
+	assert.Equal(t, rooms[1], room1)
+}
