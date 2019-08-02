@@ -91,7 +91,8 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 		creator:    user,
 		joined:     []internal.User{user},
 		visibility: request.Visibility,
-		server:     user.backend}
+		server:     user.backend,
+		state:      request.Preset}
 
 	for i, _ := range room.events {
 		room.events[i].Room = room
