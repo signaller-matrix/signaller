@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/nxshock/signaller/internal/models/registeravailable"
+
 	"github.com/nxshock/signaller/internal/models/devices"
 
 	"github.com/gorilla/mux"
@@ -345,6 +347,26 @@ func DevicesHandler(w http.ResponseWriter, r *http.Request) {
 	var response devices.Response
 	response.Devices = user.Devices()
 
+	sendJsonResponse(w, http.StatusOK, response)
+}
+
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-register-available
+func registerAvailableHandler(w http.ResponseWriter, r *http.Request) {
+	var request registeravailable.Request
+
+	err := getRequest(r, &request)
+	if err != nil {
+		errorResponse(w, models.M_BAD_JSON, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user := currServer.Backend.GetUserByName(request.Username) // TODO: add validation of username
+	if user != nil {
+		errorResponse(w, models.M_USER_IN_USE, http.StatusBadRequest, "Desired user ID is already taken.")
+		return
+	}
+
+	response := registeravailable.Response{Available: false}
 	sendJsonResponse(w, http.StatusOK, response)
 }
 

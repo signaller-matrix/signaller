@@ -113,3 +113,26 @@ func TestGetRoomByID(t *testing.T) {
 	room = backend.GetRoomByID("worng id")
 	assert.Nil(t, room)
 }
+
+func TestGetUserByName(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	var (
+		userName = "user"
+	)
+
+	user, token, err := backend.Register(userName, "", "")
+	assert.Nil(t, err)
+	assert.NotNil(t, user)
+	assert.NotEmpty(t, token)
+
+	t.Run("Test picking user with username", func(_ *testing.T) {
+		user2 := backend.GetUserByName(userName)
+		assert.Equal(t, user, user2)
+	})
+
+	t.Run("Test picking user with wrong username", func(_ *testing.T) {
+		user2 := backend.GetUserByName("wrong username")
+		assert.Nil(t, user2)
+	})
+}

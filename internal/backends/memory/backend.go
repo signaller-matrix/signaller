@@ -100,3 +100,14 @@ func (backend *Backend) GetRoomByID(id string) internal.Room {
 
 	return nil
 }
+
+func (backend *Backend) GetUserByName(userName string) internal.User {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
+
+	if user, exists := backend.data[userName]; exists {
+		return user
+	}
+
+	return nil
+}
