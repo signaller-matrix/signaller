@@ -15,6 +15,7 @@ type Backend interface {
 	GetUserByName(userName string) User
 	GetRoomByID(id string) Room
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err *models.ApiError)
+	PublicRooms() []Room
 }
 
 type Room interface {
@@ -26,6 +27,9 @@ type Room interface {
 	Topic() string
 	Events() []rooms.Event
 	Visibility() createroom.VisibilityType
+	WorldReadable() bool
+	GuestCanJoin() bool
+	AvatarURL() string
 	State() createroom.Preset
 }
 

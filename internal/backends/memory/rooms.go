@@ -9,12 +9,15 @@ import (
 )
 
 type Room struct {
-	id         string
-	visibility createroom.VisibilityType
-	aliasName  string
-	name       string
-	topic      string
-	state      createroom.Preset
+	id            string
+	visibility    createroom.VisibilityType
+	aliasName     string
+	name          string
+	topic         string
+	state         createroom.Preset
+	worldReadable bool
+	guestCanJoin  bool
+	avatarURL     string
 
 	creator internal.User
 	joined  []internal.User
@@ -92,4 +95,25 @@ func (room *Room) State() createroom.Preset {
 	defer room.mutex.RUnlock()
 
 	return room.state
+}
+
+func (room *Room) WorldReadable() bool {
+	room.mutex.RLock()
+	defer room.mutex.RUnlock()
+
+	return room.worldReadable
+}
+
+func (room *Room) GuestCanJoin() bool {
+	room.mutex.RLock()
+	defer room.mutex.RUnlock()
+
+	return room.guestCanJoin
+}
+
+func (room *Room) AvatarURL() string {
+	room.mutex.RLock()
+	defer room.mutex.RUnlock()
+
+	return room.avatarURL
 }

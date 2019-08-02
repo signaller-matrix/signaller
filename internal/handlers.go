@@ -8,21 +8,19 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nxshock/signaller/internal/models/registeravailable"
-
-	"github.com/nxshock/signaller/internal/models/devices"
-
 	"github.com/gorilla/mux"
-
-	"github.com/nxshock/signaller/internal/models/common"
 
 	"github.com/nxshock/signaller/internal/models"
 	"github.com/nxshock/signaller/internal/models/capabilities"
+	"github.com/nxshock/signaller/internal/models/common"
+	"github.com/nxshock/signaller/internal/models/devices"
 	"github.com/nxshock/signaller/internal/models/joinedrooms"
 	"github.com/nxshock/signaller/internal/models/listroom"
 	login "github.com/nxshock/signaller/internal/models/login"
 	"github.com/nxshock/signaller/internal/models/password"
+	"github.com/nxshock/signaller/internal/models/publicrooms"
 	register "github.com/nxshock/signaller/internal/models/register"
+	"github.com/nxshock/signaller/internal/models/registeravailable"
 	mSync "github.com/nxshock/signaller/internal/models/sync"
 	"github.com/nxshock/signaller/internal/models/versions"
 	"github.com/nxshock/signaller/internal/models/whoami"
@@ -407,6 +405,58 @@ func listRoomHandler(w http.ResponseWriter, r *http.Request) {
 		user.SetRoomVisibility(room, request.Visibility)
 
 		sendJsonResponse(w, http.StatusOK, struct{}{})
+	default:
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+	}
+}
+
+// https://matrix.org/docs/spec/client_server/latest#id335
+func publicRoomsHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		var request publicrooms.Request
+		err := getRequest(r, &request)
+		if err != nil {
+			errorResponse(w, models.M_BAD_JSON, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		if request.Limit <= 0 {
+			request.Limit = 50 // TODO: move to const
+		}
+
+		chunks := roomsToPublicRoomsChunks(currServer.Backend.PublicRooms())
+
+		var response publicrooms.Response
+
+		// TODO: test and rewrite this code
+		if request.Since == "" {
+			if request.Limit >= len(chunks) {
+				response.Chunk = chunks
+				// TODO: should fill response.TotalRoomCountEstimate?
+			} else {
+				response.Chunk = chunks[:request.Limit]
+				response.NextBatch = strconv.Itoa(request.Limit + 1)
+				response.TotalRoomCountEstimate = len(chunks)
+			}
+		} else {
+			response.PrevBatch = "0"
+
+			from, err := strconv.Atoi(request.Since)
+			if err != nil {
+				errorResponse(w, models.M_INVALID_PARAM, http.StatusBadRequest, "Wrong Since field specified") // TODO: check code
+				return
+			}
+			if len(chunks) >= from {
+				if request.Limit >= len(chunks) {
+					response.Chunk = chunks[from : from+request.Limit]
+				} else {
+					response.Chunk = chunks[from:]
+				}
+			}
+		}
+		sendJsonResponse(w, http.StatusOK, response)
+	case http.MethodPost: // TODO: implement
 	default:
 		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
 	}

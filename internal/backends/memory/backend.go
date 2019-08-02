@@ -1,7 +1,10 @@
 package memory
 
 import (
+	"sort"
 	"sync"
+
+	"github.com/nxshock/signaller/internal/models/createroom"
 
 	"github.com/nxshock/signaller/internal"
 	"github.com/nxshock/signaller/internal/models"
@@ -110,4 +113,21 @@ func (backend *Backend) GetUserByName(userName string) internal.User {
 	}
 
 	return nil
+}
+
+func (backend *Backend) PublicRooms() []internal.Room {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
+
+	var rooms []internal.Room
+
+	for _, room := range backend.rooms {
+		if room.State() == createroom.PublicChat {
+			rooms = append(rooms, room)
+		}
+	}
+
+	sort.Sort(BySize(rooms))
+
+	return rooms
 }
