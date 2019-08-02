@@ -14,6 +14,7 @@ type Room struct {
 	aliasName  string
 	name       string
 	topic      string
+	state      createroom.Preset
 
 	creator internal.User
 	joined  []internal.User
@@ -84,4 +85,11 @@ func (room *Room) Creator() internal.User {
 	defer room.mutex.RUnlock()
 
 	return room.creator
+}
+
+func (room *Room) State() createroom.Preset {
+	room.mutex.RLock()
+	defer room.mutex.RUnlock()
+
+	return room.state
 }

@@ -26,6 +26,7 @@ type Room interface {
 	Topic() string
 	Events() []rooms.Event
 	Visibility() createroom.VisibilityType
+	State() createroom.Preset
 }
 
 type User interface {

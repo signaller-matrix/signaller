@@ -16,8 +16,8 @@ type Preset string
 
 const (
 	PrivateChat        Preset = "private_chat"
-	PublicChat                = "public_chat"
-	TrustedPrivateChat        = "trusted_private_chat"
+	PublicChat         Preset = "public_chat"
+	TrustedPrivateChat Preset = "trusted_private_chat"
 )
 
 // Invite3pid represents third party IDs to invite into the room
