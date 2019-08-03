@@ -9,12 +9,12 @@ import (
 )
 
 type Backend interface {
-	Register(username, password, device string) (user User, token string, err *models.ApiError)
-	Login(username, password, device string) (user User, token string, err *models.ApiError)
+	Register(username, password, device string) (user User, token string, err models.ApiError)
+	Login(username, password, device string) (user User, token string, err models.ApiError)
 	GetUserByToken(token string) (user User)
 	GetUserByName(userName string) User
 	GetRoomByID(id string) Room
-	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err *models.ApiError)
+	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err models.ApiError)
 	PublicRooms() []Room
 }
 
@@ -37,15 +37,15 @@ type User interface {
 	Name() string
 	ID() string
 	Password() string
-	CreateRoom(request createroom.Request) (Room, *models.ApiError)
-	LeaveRoom(room Room) *models.ApiError
-	SetTopic(room Room, topic string) *models.ApiError
-	SendMessage(room Room, text string) *models.ApiError
+	CreateRoom(request createroom.Request) (Room, models.ApiError)
+	LeaveRoom(room Room) models.ApiError
+	SetTopic(room Room, topic string) models.ApiError
+	SendMessage(room Room, text string) models.ApiError
 	JoinedRooms() []Room
 	ChangePassword(newPassword string)
 	Devices() []devices.Device
-	SetRoomVisibility(Room, createroom.VisibilityType) *models.ApiError
+	SetRoomVisibility(Room, createroom.VisibilityType) models.ApiError
 	Logout(token string)
 	LogoutAll()
-	JoinRoom(Room) *models.ApiError
+	JoinRoom(Room) models.ApiError
 }

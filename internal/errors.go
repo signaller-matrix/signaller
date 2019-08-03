@@ -6,21 +6,14 @@ import (
 	"github.com/nxshock/signaller/internal/models"
 )
 
-func errorResponse(w http.ResponseWriter, code models.ApiError, httpCode int, message string) {
+func errorResponse(w http.ResponseWriter, code models.ApiError, httpCode int, messageOverride string) {
 	w.Header().Set("Content-Type", "application/json")
 
-	if message != "" {
-		code.Message = message
-	}
-
 	w.WriteHeader(httpCode)
-	w.Write(code.JSON())
-}
 
-func NewError(code models.ApiError, message string) *models.ApiError {
-	if message != "" {
-		code.Message = message
+	if messageOverride != "" {
+		w.Write(models.NewError(code, messageOverride).JSON())
+	} else {
+		w.Write(code.JSON())
 	}
-
-	return &code
 }

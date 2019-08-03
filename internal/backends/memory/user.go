@@ -33,10 +33,10 @@ func (user *User) Password() string {
 	return user.password
 }
 
-func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models.ApiError) {
+func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.ApiError) {
 	for _, existingRoom := range user.backend.rooms {
 		if existingRoom.AliasName() == request.RoomAliasName { // TODO: strip and check request room alias name before use
-			return nil, internal.NewError(models.M_ROOM_IN_USE, "")
+			return nil, models.NewError(models.M_ROOM_IN_USE, "")
 		}
 	}
 
@@ -104,12 +104,12 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, *models
 	return room, nil
 }
 
-func (user *User) SetTopic(room internal.Room, topic string) *models.ApiError {
+func (user *User) SetTopic(room internal.Room, topic string) models.ApiError {
 	room.(*Room).mutex.Lock()
 	defer room.(*Room).mutex.Unlock()
 
 	if room.(*Room).creator.ID() != user.ID() { // TODO: currently only creator can change topic
-		return internal.NewError(models.M_FORBIDDEN, "")
+		return models.NewError(models.M_FORBIDDEN, "")
 	}
 
 	room.(*Room).topic = topic
@@ -122,7 +122,7 @@ func (user *User) SetTopic(room internal.Room, topic string) *models.ApiError {
 	return nil
 }
 
-func (user *User) LeaveRoom(room internal.Room) *models.ApiError {
+func (user *User) LeaveRoom(room internal.Room) models.ApiError {
 	room.(*Room).mutex.Lock()
 	defer room.(*Room).mutex.Unlock()
 
@@ -133,10 +133,10 @@ func (user *User) LeaveRoom(room internal.Room) *models.ApiError {
 		}
 	}
 
-	return internal.NewError(models.M_BAD_STATE, "you are not a member of group") // TODO: check error code
+	return models.NewError(models.M_BAD_STATE, "you are not a member of group") // TODO: check error code
 }
 
-func (user *User) SendMessage(room internal.Room, text string) *models.ApiError {
+func (user *User) SendMessage(room internal.Room, text string) models.ApiError {
 	room.(*Room).mutex.Lock()
 	defer room.(*Room).mutex.Unlock()
 
@@ -148,7 +148,7 @@ func (user *User) SendMessage(room internal.Room, text string) *models.ApiError 
 	}
 
 	if !userInRoom {
-		return internal.NewError(models.M_FORBIDDEN, "")
+		return models.NewError(models.M_FORBIDDEN, "")
 	}
 
 	room.(*Room).events = append(room.(*Room).events, RoomEvent{
@@ -195,9 +195,9 @@ func (user *User) Devices() []devices.Device {
 	return result
 }
 
-func (user *User) SetRoomVisibility(room internal.Room, visibilityType createroom.VisibilityType) *models.ApiError {
+func (user *User) SetRoomVisibility(room internal.Room, visibilityType createroom.VisibilityType) models.ApiError {
 	if user.ID() != room.Creator().ID() {
-		return internal.NewError(models.M_FORBIDDEN, "only room owner can change visibility") // TODO: room administrators can use this method too
+		return models.NewError(models.M_FORBIDDEN, "only room owner can change visibility") // TODO: room administrators can use this method too
 	}
 
 	room.(*Room).mutex.Lock()
@@ -223,7 +223,7 @@ func (user *User) LogoutAll() {
 	user.Tokens = make(map[string]Token)
 }
 
-func (user *User) JoinRoom(room internal.Room) *models.ApiError {
+func (user *User) JoinRoom(room internal.Room) models.ApiError {
 	memRoom := room.(*Room)
 
 	memRoom.mutex.Lock()
@@ -231,7 +231,7 @@ func (user *User) JoinRoom(room internal.Room) *models.ApiError {
 
 	for _, roomUser := range memRoom.joined {
 		if roomUser.ID() == user.ID() {
-			return internal.NewError(models.M_BAD_STATE, "user already in room") // TODO: check code
+			return models.NewError(models.M_BAD_STATE, "user already in room") // TODO: check code
 		}
 	}
 

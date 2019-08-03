@@ -12,7 +12,7 @@ func TestCreateRoom(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	user, _, err := backend.Register("user1", "", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	request := createroom.Request{
 		RoomAliasName: "room1",
@@ -20,7 +20,7 @@ func TestCreateRoom(t *testing.T) {
 		Topic:         "topic"}
 
 	room, err := user.CreateRoom(request)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, request.RoomAliasName, room.AliasName())
 	assert.Equal(t, request.Name, room.Name())
 	assert.Equal(t, request.Topic, room.Topic())
@@ -40,7 +40,7 @@ func TestCreateAlreadyExistingRoom(t *testing.T) {
 		Topic:         "topic"}
 
 	_, err := user.CreateRoom(request)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, err = user.CreateRoom(request)
 	assert.NotNil(t, err)
@@ -60,7 +60,7 @@ func TestSetRoomTopic(t *testing.T) {
 
 	var newTopic = "new topic"
 	err := user.SetTopic(room, newTopic)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, newTopic, room.Topic())
 	assert.Equal(t, 5, len(room.Events())) // TODO: check start event count
 }
@@ -109,7 +109,7 @@ func TestRoomUserCount(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	user1, _, err := backend.Register("user1", "", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	request := createroom.Request{
 		RoomAliasName: "room1",
@@ -117,7 +117,7 @@ func TestRoomUserCount(t *testing.T) {
 		Topic:         "topic"}
 
 	room, err := user1.CreateRoom(request)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Len(t, room.Users(), 1)
 
 	// TODO: add join another user test

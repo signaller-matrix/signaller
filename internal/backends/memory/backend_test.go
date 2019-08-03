@@ -18,7 +18,7 @@ func TestRegisterUser(t *testing.T) {
 	)
 
 	user, token, err := backend.Register(username, password, device)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, username, user.Name())
 	assert.Equal(t, password, user.Password())
 	assert.NotEmpty(t, token)
@@ -32,7 +32,7 @@ func TestRegisterUserWithAlreadyTakenName(t *testing.T) {
 	)
 
 	_, _, err := backend.Register(userName, "", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, _, err = backend.Register(userName, "", "")
 	assert.NotNil(t, err)
@@ -47,10 +47,10 @@ func TestLogin(t *testing.T) {
 	)
 
 	_, _, err := backend.Register(userName, password, "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, token, err := backend.Login(userName, password, "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotZero(t, token)
 }
 
@@ -63,7 +63,7 @@ func TestLoginWithWrongCredentials(t *testing.T) {
 	)
 
 	_, _, err := backend.Register(userName, password, "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, _, err = backend.Login(userName, "wrong password", "")
 	assert.NotNil(t, err)
@@ -81,10 +81,10 @@ func TestLogout(t *testing.T) {
 	)
 
 	user, _, err := backend.Register(userName, password, "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, token, err := backend.Login(userName, password, "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotZero(t, token)
 
 	user.Logout(token)
@@ -96,7 +96,7 @@ func TestGetRoomByID(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	user, token, err := backend.Register("user", "", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, user)
 	assert.NotEmpty(t, token)
 
@@ -105,7 +105,7 @@ func TestGetRoomByID(t *testing.T) {
 		Name:          "room1"}
 
 	room, err := user.CreateRoom(request)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, room)
 	assert.Equal(t, room.ID(), backend.GetRoomByID(room.ID()).ID())
 
@@ -122,7 +122,7 @@ func TestGetUserByName(t *testing.T) {
 	)
 
 	user, token, err := backend.Register(userName, "", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, user)
 	assert.NotEmpty(t, token)
 
@@ -141,7 +141,7 @@ func TestPublicRooms(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	user1, _, err := backend.Register("user1", "", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, user1)
 
 	// Create first room
@@ -151,7 +151,7 @@ func TestPublicRooms(t *testing.T) {
 		Preset:        createroom.PublicChat}
 
 	room1, err := user1.CreateRoom(request)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, room1)
 
 	// Create second room
@@ -161,16 +161,16 @@ func TestPublicRooms(t *testing.T) {
 		Preset:        createroom.PublicChat}
 
 	room2, err := user1.CreateRoom(request)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, room2)
 
 	// Make room2 has 2 users
 	user2, _, err := backend.Register("user2", "", "")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.NotNil(t, user2)
 
 	err = user2.JoinRoom(room2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	rooms := backend.PublicRooms()
 	assert.Len(t, rooms, 2)

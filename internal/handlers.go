@@ -68,7 +68,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 			_, token, apiErr := currServer.Backend.Login(request.Identifier.User, request.Password, request.DeviceID)
 			if apiErr != nil {
-				errorResponse(w, *apiErr, http.StatusForbidden, "")
+				errorResponse(w, apiErr, http.StatusForbidden, "")
 				return
 			}
 
@@ -110,7 +110,7 @@ func leaveRoomHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := user.LeaveRoom(room)
 	if err != nil {
-		errorResponse(w, *err, http.StatusBadRequest, "")
+		errorResponse(w, err, http.StatusBadRequest, "")
 		return
 	}
 
@@ -185,7 +185,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, token, apiErr := currServer.Backend.Register(request.Username, request.Password, request.DeviceID)
 	if apiErr != nil {
-		errorResponse(w, *apiErr, http.StatusBadRequest, "")
+		errorResponse(w, apiErr, http.StatusBadRequest, "")
 		return
 	}
 

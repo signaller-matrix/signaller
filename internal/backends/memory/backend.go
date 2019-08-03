@@ -29,12 +29,12 @@ func NewBackend(hostname string) *Backend {
 		data:     make(map[string]internal.User)}
 }
 
-func (backend *Backend) Register(username, password, device string) (user internal.User, token string, err *models.ApiError) {
+func (backend *Backend) Register(username, password, device string) (user internal.User, token string, err models.ApiError) {
 	backend.mutex.Lock()
 
 	if _, ok := backend.data[username]; ok {
 		backend.mutex.Unlock()
-		return nil, "", internal.NewError(models.M_USER_IN_USE, "trying to register a user ID which has been taken")
+		return nil, "", models.NewError(models.M_USER_IN_USE, "trying to register a user ID which has been taken")
 	}
 
 	user = &User{
@@ -49,17 +49,17 @@ func (backend *Backend) Register(username, password, device string) (user intern
 	return backend.Login(username, password, device)
 }
 
-func (backend *Backend) Login(username, password, device string) (user internal.User, token string, err *models.ApiError) {
+func (backend *Backend) Login(username, password, device string) (user internal.User, token string, err models.ApiError) {
 	backend.mutex.Lock()
 	defer backend.mutex.Unlock()
 
 	user, ok := backend.data[username]
 	if !ok {
-		return nil, "", internal.NewError(models.M_FORBIDDEN, "wrong username")
+		return nil, "", models.NewError(models.M_FORBIDDEN, "wrong username")
 	}
 
 	if user.Password() != password {
-		return nil, "", internal.NewError(models.M_FORBIDDEN, "wrong password")
+		return nil, "", models.NewError(models.M_FORBIDDEN, "wrong password")
 	}
 
 	token = newToken(defaultTokenSize)
@@ -69,7 +69,7 @@ func (backend *Backend) Login(username, password, device string) (user internal.
 	return user, token, nil
 }
 
-func (backend *Backend) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err *models.ApiError) {
+func (backend *Backend) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err models.ApiError) {
 	backend.mutex.Lock()
 	defer backend.mutex.Unlock()
 
