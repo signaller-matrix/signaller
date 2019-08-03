@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/nxshock/signaller/internal"
-	"github.com/nxshock/signaller/internal/models/rooms"
+	"github.com/signaller-matrix/signaller/internal"
+	"github.com/signaller-matrix/signaller/internal/models/rooms"
 )
 
 type RoomEvent struct {

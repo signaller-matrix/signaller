@@ -4,8 +4,8 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/nxshock/signaller/internal"
-	"github.com/nxshock/signaller/internal/backends/memory"
+	"github.com/signaller-matrix/signaller/internal"
+	"github.com/signaller-matrix/signaller/internal/backends/memory"
 )
 
 var (

@@ -3,11 +3,10 @@ package memory
 import (
 	"testing"
 
-	"github.com/nxshock/signaller/internal"
-
 	"github.com/stretchr/testify/assert"
 
-	"github.com/nxshock/signaller/internal/models/createroom"
+	"github.com/signaller-matrix/signaller/internal"
+	"github.com/signaller-matrix/signaller/internal/models/createroom"
 )
 
 func TestUserID(t *testing.T) {

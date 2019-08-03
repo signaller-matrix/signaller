@@ -4,11 +4,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nxshock/signaller/internal"
-	"github.com/nxshock/signaller/internal/models"
-	"github.com/nxshock/signaller/internal/models/createroom"
-	"github.com/nxshock/signaller/internal/models/devices"
-	"github.com/nxshock/signaller/internal/models/rooms"
+	"github.com/signaller-matrix/signaller/internal"
+	"github.com/signaller-matrix/signaller/internal/models"
+	"github.com/signaller-matrix/signaller/internal/models/createroom"
+	"github.com/signaller-matrix/signaller/internal/models/devices"
+	"github.com/signaller-matrix/signaller/internal/models/rooms"
 )
 
 type User struct {

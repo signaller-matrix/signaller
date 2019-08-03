@@ -3,7 +3,7 @@ package internal
 import (
 	"net/http"
 
-	"github.com/nxshock/signaller/internal/models"
+	"github.com/signaller-matrix/signaller/internal/models"
 )
 
 func errorResponse(w http.ResponseWriter, code models.ApiError, httpCode int, messageOverride string) {

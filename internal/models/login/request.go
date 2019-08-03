@@ -1,7 +1,7 @@
 package login
 
 import (
-	common "github.com/nxshock/signaller/internal/models/common"
+	"github.com/signaller-matrix/signaller/internal/models/common"
 )
 
 // PostRequest represents POST login request

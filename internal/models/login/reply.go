@@ -1,7 +1,7 @@
 package login
 
 import (
-	common "github.com/nxshock/signaller/internal/models/common"
+	common "github.com/signaller-matrix/signaller/internal/models/common"
 )
 
 // PostReply is returned reply from POST login method

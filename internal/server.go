@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/nxshock/signaller/internal/models/capabilities"
+	"github.com/signaller-matrix/signaller/internal/models/capabilities"
 )
 
 var currServer *Server

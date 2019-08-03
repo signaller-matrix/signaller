@@ -1,11 +1,11 @@
 package internal
 
 import (
-	"github.com/nxshock/signaller/internal/models"
-	"github.com/nxshock/signaller/internal/models/createroom"
-	"github.com/nxshock/signaller/internal/models/devices"
-	"github.com/nxshock/signaller/internal/models/rooms"
-	"github.com/nxshock/signaller/internal/models/sync"
+	"github.com/signaller-matrix/signaller/internal/models"
+	"github.com/signaller-matrix/signaller/internal/models/createroom"
+	"github.com/signaller-matrix/signaller/internal/models/devices"
+	"github.com/signaller-matrix/signaller/internal/models/rooms"
+	"github.com/signaller-matrix/signaller/internal/models/sync"
 )
 
 type Backend interface {

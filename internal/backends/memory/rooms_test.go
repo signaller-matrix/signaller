@@ -3,7 +3,7 @@ package memory
 import (
 	"testing"
 
-	"github.com/nxshock/signaller/internal/models/createroom"
+	"github.com/signaller-matrix/signaller/internal/models/createroom"
 
 	"github.com/stretchr/testify/assert"
 )

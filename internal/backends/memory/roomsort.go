@@ -1,7 +1,7 @@
 package memory
 
 import (
-	"github.com/nxshock/signaller/internal"
+	"github.com/signaller-matrix/signaller/internal"
 )
 
 type BySize []internal.Room

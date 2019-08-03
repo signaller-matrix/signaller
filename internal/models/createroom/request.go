@@ -1,7 +1,7 @@
 package createroom
 
 import (
-	common "github.com/nxshock/signaller/internal/models/common"
+	common "github.com/signaller-matrix/signaller/internal/models/common"
 )
 
 // https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-createroom

@@ -3,7 +3,7 @@ package rooms
 import (
 	"encoding/json"
 
-	"github.com/nxshock/signaller/internal/models/events"
+	"github.com/signaller-matrix/signaller/internal/models/events"
 )
 
 // Type is type of event

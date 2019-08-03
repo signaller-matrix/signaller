@@ -1,7 +1,7 @@
 package sendmessage
 
 import (
-	common "github.com/nxshock/signaller/internal/models/common"
+	common "github.com/signaller-matrix/signaller/internal/models/common"
 )
 
 type SendMessageRequest struct {

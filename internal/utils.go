@@ -1,6 +1,6 @@
 package internal
 
-import "github.com/nxshock/signaller/internal/models/publicrooms"
+import "github.com/signaller-matrix/signaller/internal/models/publicrooms"
 
 func roomsToPublicRoomsChunks(rooms []Room) []publicrooms.PublicRoomsChunk {
 	var chunks []publicrooms.PublicRoomsChunk

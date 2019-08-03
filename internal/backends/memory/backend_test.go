@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/nxshock/signaller/internal/models/createroom"
+	"github.com/signaller-matrix/signaller/internal/models/createroom"
 )
 
 func TestRegisterUser(t *testing.T) {
