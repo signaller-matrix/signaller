@@ -16,6 +16,7 @@ type Backend interface {
 	GetRoomByID(id string) Room
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err models.ApiError)
 	PublicRooms() []Room
+	ValidateUsernameFunc() func(string) error
 }
 
 type Room interface {

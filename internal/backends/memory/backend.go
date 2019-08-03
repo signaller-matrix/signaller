@@ -1,6 +1,8 @@
 package memory
 
 import (
+	"fmt"
+	"regexp"
 	"sort"
 	"sync"
 
@@ -12,10 +14,11 @@ import (
 )
 
 type Backend struct {
-	data     map[string]internal.User
-	rooms    map[string]internal.Room
-	hostname string
-	mutex    sync.Mutex // TODO: replace with RW mutex
+	data                 map[string]internal.User
+	rooms                map[string]internal.Room
+	hostname             string
+	validateUsernameFunc func(string) error // TODO: create ability to redefine validation func
+	mutex                sync.Mutex         // TODO: replace with RW mutex
 }
 
 type Token struct {
@@ -24,13 +27,21 @@ type Token struct {
 
 func NewBackend(hostname string) *Backend {
 	return &Backend{
-		hostname: hostname,
-		rooms:    make(map[string]internal.Room),
-		data:     make(map[string]internal.User)}
+		hostname:             hostname,
+		validateUsernameFunc: defaultValidationUsernameFunc,
+		rooms:                make(map[string]internal.Room),
+		data:                 make(map[string]internal.User)}
 }
 
 func (backend *Backend) Register(username, password, device string) (user internal.User, token string, err models.ApiError) {
 	backend.mutex.Lock()
+
+	if backend.validateUsernameFunc != nil {
+		err := backend.validateUsernameFunc(username)
+		if err != nil {
+			return nil, "", models.NewError(models.M_INVALID_USERNAME, err.Error())
+		}
+	}
 
 	if _, ok := backend.data[username]; ok {
 		backend.mutex.Unlock()
@@ -130,4 +141,21 @@ func (backend *Backend) PublicRooms() []internal.Room {
 	sort.Sort(BySize(rooms))
 
 	return rooms
+}
+
+func (backend *Backend) ValidateUsernameFunc() func(string) error {
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
+
+	return backend.validateUsernameFunc
+}
+
+func defaultValidationUsernameFunc(userName string) error {
+	const re = `\w{5,}`
+
+	if !regexp.MustCompile(re).MatchString(userName) {
+		return fmt.Errorf("username does not match %s", re)
+	}
+
+	return nil
 }
