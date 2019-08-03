@@ -18,7 +18,7 @@ type Backend struct {
 	rooms                map[string]internal.Room
 	hostname             string
 	validateUsernameFunc func(string) error // TODO: create ability to redefine validation func
-	mutex                sync.Mutex         // TODO: replace with RW mutex
+	mutex                sync.RWMutex
 }
 
 type Token struct {
@@ -88,8 +88,8 @@ func (backend *Backend) Sync(token string, request mSync.SyncRequest) (response 
 }
 
 func (backend *Backend) GetUserByToken(token string) internal.User {
-	backend.mutex.Lock()
-	defer backend.mutex.Unlock()
+	backend.mutex.RLock()
+	defer backend.mutex.RUnlock()
 
 	for _, user := range backend.data {
 		for userToken := range user.(*User).Tokens {
@@ -103,8 +103,8 @@ func (backend *Backend) GetUserByToken(token string) internal.User {
 }
 
 func (backend *Backend) GetRoomByID(id string) internal.Room {
-	backend.mutex.Lock()
-	defer backend.mutex.Unlock()
+	backend.mutex.RLock()
+	defer backend.mutex.RUnlock()
 
 	for roomID, room := range backend.rooms {
 		if roomID == id {
@@ -116,8 +116,8 @@ func (backend *Backend) GetRoomByID(id string) internal.Room {
 }
 
 func (backend *Backend) GetUserByName(userName string) internal.User {
-	backend.mutex.Lock()
-	defer backend.mutex.Unlock()
+	backend.mutex.RLock()
+	defer backend.mutex.RUnlock()
 
 	if user, exists := backend.data[userName]; exists {
 		return user
@@ -127,8 +127,8 @@ func (backend *Backend) GetUserByName(userName string) internal.User {
 }
 
 func (backend *Backend) PublicRooms(filter string) []internal.Room {
-	backend.mutex.Lock()
-	defer backend.mutex.Unlock()
+	backend.mutex.RLock()
+	defer backend.mutex.RUnlock()
 
 	var rooms []internal.Room
 
@@ -147,8 +147,8 @@ func (backend *Backend) PublicRooms(filter string) []internal.Room {
 }
 
 func (backend *Backend) ValidateUsernameFunc() func(string) error {
-	backend.mutex.Lock()
-	defer backend.mutex.Unlock()
+	backend.mutex.RLock()
+	defer backend.mutex.RUnlock()
 
 	return backend.validateUsernameFunc
 }
