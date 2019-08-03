@@ -1,8 +1,8 @@
 # Signaller
 
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
-[![Build Status](https://travis-ci.com/nxshock/signaller.svg?branch=master)](https://travis-ci.com/nxshock/signaller)
-[![Coverage Status](https://coveralls.io/repos/github/nxshock/signaller/badge.svg)](https://coveralls.io/github/nxshock/signaller)
+[![Build Status](https://travis-ci.com/signaller-matrix/signaller.svg?branch=master)](https://travis-ci.com/signaller-matrix/signaller)
+[![Coverage Status](https://coveralls.io/repos/github/signaller-matrix/signaller/badge.svg)](https://coveralls.io/github/signaller-matrix/signaller)
 
 > A Matrix homeserver, which written in Go language.
 
@@ -22,7 +22,7 @@ This is a lightweight (but full-featured) Matrix server, written in Go language,
 ## Building
 
 ```
-$ git clone https://github.com/nxshock/signaller.git
+$ git clone https://github.com/signaller-matrix/signaller.git
 $ cd signaller
 $ make
 ```
