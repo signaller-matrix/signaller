@@ -412,54 +412,68 @@ func listRoomHandler(w http.ResponseWriter, r *http.Request) {
 
 // https://matrix.org/docs/spec/client_server/latest#id335
 func publicRoomsHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		var request publicrooms.Request
-		err := getRequest(r, &request)
-		if err != nil {
-			errorResponse(w, models.M_BAD_JSON, http.StatusBadRequest, err.Error())
+	if r.Method != http.MethodGet && r.Method != http.MethodPost {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+	var request publicrooms.Request
+	err := getRequest(r, &request)
+	if err != nil {
+		errorResponse(w, models.M_BAD_JSON, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if request.Limit <= 0 {
+		request.Limit = 50 // TODO: move to const
+	}
+
+	if r.Method == http.MethodPost {
+		token := getTokenFromResponse(r)
+		if token == "" {
+			errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
 			return
 		}
 
-		if request.Limit <= 0 {
-			request.Limit = 50 // TODO: move to const
+		user := currServer.Backend.GetUserByToken(token)
+		if user == nil {
+			errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+			return
 		}
-
-		chunks := roomsToPublicRoomsChunks(currServer.Backend.PublicRooms())
-
-		var response publicrooms.Response
-
-		// TODO: test and rewrite this code
-		if request.Since == "" {
-			if request.Limit >= len(chunks) {
-				response.Chunk = chunks
-				// TODO: should fill response.TotalRoomCountEstimate?
-			} else {
-				response.Chunk = chunks[:request.Limit]
-				response.NextBatch = strconv.Itoa(request.Limit + 1)
-				response.TotalRoomCountEstimate = len(chunks)
-			}
-		} else {
-			response.PrevBatch = "0"
-
-			from, err := strconv.Atoi(request.Since)
-			if err != nil {
-				errorResponse(w, models.M_INVALID_PARAM, http.StatusBadRequest, "Wrong Since field specified") // TODO: check code
-				return
-			}
-			if len(chunks) >= from {
-				if request.Limit >= len(chunks) {
-					response.Chunk = chunks[from : from+request.Limit]
-				} else {
-					response.Chunk = chunks[from:]
-				}
-			}
-		}
-		sendJsonResponse(w, http.StatusOK, response)
-	case http.MethodPost: // TODO: implement
-	default:
-		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
 	}
+
+	publicRooms := currServer.Backend.PublicRooms(request.Filter.GenericSearchTerm) // TODO: make Post request as User method
+	chunks := roomsToPublicRoomsChunks(publicRooms)
+
+	var response publicrooms.Response
+
+	// TODO: test and rewrite this code
+	if request.Since == "" {
+		if request.Limit >= len(chunks) {
+			response.Chunk = chunks
+			// TODO: should fill response.TotalRoomCountEstimate?
+		} else {
+			response.Chunk = chunks[:request.Limit]
+			response.NextBatch = strconv.Itoa(request.Limit + 1)
+			response.TotalRoomCountEstimate = len(chunks)
+		}
+	} else {
+		response.PrevBatch = "0"
+
+		from, err := strconv.Atoi(request.Since)
+		if err != nil {
+			errorResponse(w, models.M_INVALID_PARAM, http.StatusBadRequest, "Wrong Since field specified") // TODO: check code
+			return
+		}
+		if len(chunks) >= from {
+			if request.Limit >= len(chunks) {
+				response.Chunk = chunks[from : from+request.Limit]
+			} else {
+				response.Chunk = chunks[from:]
+			}
+		}
+	}
+	sendJsonResponse(w, http.StatusOK, response)
 }
 
 func sendJsonResponse(w http.ResponseWriter, httpStatus int, data interface{}) error {

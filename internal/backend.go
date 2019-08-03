@@ -15,7 +15,7 @@ type Backend interface {
 	GetUserByName(userName string) User
 	GetRoomByID(id string) Room
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err models.ApiError)
-	PublicRooms() []Room
+	PublicRooms(filter string) []Room
 	ValidateUsernameFunc() func(string) error
 }
 

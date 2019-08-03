@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/signaller-matrix/signaller/internal"
@@ -125,14 +126,17 @@ func (backend *Backend) GetUserByName(userName string) internal.User {
 	return nil
 }
 
-func (backend *Backend) PublicRooms() []internal.Room {
+func (backend *Backend) PublicRooms(filter string) []internal.Room {
 	backend.mutex.Lock()
 	defer backend.mutex.Unlock()
 
 	var rooms []internal.Room
 
 	for _, room := range backend.rooms {
-		if room.State() == createroom.PublicChat {
+		if room.State() == createroom.PublicChat &&
+			(strings.Contains(room.Name(), filter) ||
+				strings.Contains(room.Topic(), filter) ||
+				strings.Contains(room.AliasName(), filter)) {
 			rooms = append(rooms, room)
 		}
 	}

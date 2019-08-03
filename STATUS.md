@@ -114,7 +114,7 @@ Implemented from [Client-Server API](https://matrix.org/docs/spec/client_server/
 - [x] [10.5.2 PUT /_matrix/client/r0/directory/list/room/{roomId}](https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-directory-list-room-roomid)
 
 - [x] [10.5.3 GET /_matrix/client/r0/publicRooms](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-publicrooms)
-- [ ] [10.5.4 POST /_matrix/client/r0/publicRooms](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-publicrooms)
+- [x] [10.5.4 POST /_matrix/client/r0/publicRooms](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-publicrooms)
 
 ## [11 User Data](https://matrix.org/docs/spec/client_server/latest#user-data)
 

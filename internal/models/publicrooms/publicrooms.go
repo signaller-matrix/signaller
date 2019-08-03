@@ -1,9 +1,13 @@
 package publicrooms
 
+// Merged request for Get and Post methods
 type Request struct {
-	Limit  int    `json:"limit"`  // Limit the number of results returned.
-	Since  string `json:"since"`  // A pagination token from a previous request, allowing clients to get the next (or previous) batch of rooms. The direction of pagination is specified solely by which token is supplied, rather than via an explicit flag.
-	Server string `json:"server"` // The server to fetch the public room lists from. Defaults to the local server.
+	Limit                int    `json:"limit"`                   // Limit the number of results returned.
+	Since                string `json:"since"`                   // A pagination token from a previous request, allowing clients to get the next (or previous) batch of rooms. The direction of pagination is specified solely by which token is supplied, rather than via an explicit flag.
+	Server               string `json:"server"`                  // The server to fetch the public room lists from. Defaults to the local server.
+	Filter               Filter `json:"filter"`                  // Filter to apply to the results.
+	IncludeAllNetworks   bool   `json:"include_all_networks"`    // Whether or not to include all known networks/protocols from application services on the homeserver. Defaults to false.
+	ThirdPartyInstanceID string `json:"third_party_instance_id"` // The specific third party network/protocol to request from the homeserver. Can only be used if include_all_networks is false.
 }
 
 type Response struct {
@@ -23,4 +27,8 @@ type PublicRoomsChunk struct {
 	WorldReadable    bool     `json:"world_readable"`            // Required. Whether the room may be viewed by guest users without joining.
 	GuestCanJoin     bool     `json:"guest_can_join"`            // Required. Whether guest users may join the room and participate in it. If they can, they will be subject to ordinary power level rules like any other user.
 	AvatarURL        string   `json:"avatar_url,omitempty"`      // The URL for the room's avatar, if one is set.
+}
+
+type Filter struct {
+	GenericSearchTerm string `json:"generic_search_term,omitempty"` // A string to search for in the room metadata, e.g. name, topic, canonical alias etc. (Optional).
 }
