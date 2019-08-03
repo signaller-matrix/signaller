@@ -12,7 +12,7 @@ func TestRegisterUser(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	var (
-		username = "user1"
+		username = "username1"
 		password = "password1"
 		device   = "device1"
 	)
@@ -28,7 +28,7 @@ func TestRegisterUserWithAlreadyTakenName(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	var (
-		userName = "user1"
+		userName = "username1"
 	)
 
 	_, _, err := backend.Register(userName, "", "")
@@ -42,7 +42,7 @@ func TestLogin(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	var (
-		userName = "user1"
+		userName = "username1"
 		password = "password1"
 	)
 
@@ -58,7 +58,7 @@ func TestLoginWithWrongCredentials(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	var (
-		userName = "user1"
+		userName = "username1"
 		password = "password1"
 	)
 
@@ -76,7 +76,7 @@ func TestLogout(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	var (
-		userName = "user1"
+		userName = "username1"
 		password = "password1"
 	)
 
@@ -95,7 +95,7 @@ func TestLogout(t *testing.T) {
 func TestGetRoomByID(t *testing.T) {
 	backend := NewBackend("localhost")
 
-	user, token, err := backend.Register("user", "", "")
+	user, token, err := backend.Register("username", "", "")
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 	assert.NotEmpty(t, token)
@@ -118,7 +118,7 @@ func TestGetUserByName(t *testing.T) {
 	backend := NewBackend("localhost")
 
 	var (
-		userName = "user"
+		userName = "username"
 	)
 
 	user, token, err := backend.Register(userName, "", "")
@@ -140,9 +140,9 @@ func TestGetUserByName(t *testing.T) {
 func TestPublicRooms(t *testing.T) {
 	backend := NewBackend("localhost")
 
-	user1, _, err := backend.Register("user1", "", "")
+	username1, _, err := backend.Register("username1", "", "")
 	assert.NoError(t, err)
-	assert.NotNil(t, user1)
+	assert.NotNil(t, username1)
 
 	// Create first room
 	request := createroom.Request{
@@ -150,7 +150,7 @@ func TestPublicRooms(t *testing.T) {
 		Name:          "room1",
 		Preset:        createroom.PublicChat}
 
-	room1, err := user1.CreateRoom(request)
+	room1, err := username1.CreateRoom(request)
 	assert.NoError(t, err)
 	assert.NotNil(t, room1)
 
@@ -160,7 +160,7 @@ func TestPublicRooms(t *testing.T) {
 		Name:          "room2",
 		Preset:        createroom.PublicChat}
 
-	room2, err := user1.CreateRoom(request)
+	room2, err := username1.CreateRoom(request)
 	assert.NoError(t, err)
 	assert.NotNil(t, room2)
 

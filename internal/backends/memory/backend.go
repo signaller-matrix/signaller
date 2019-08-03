@@ -151,7 +151,7 @@ func (backend *Backend) ValidateUsernameFunc() func(string) error {
 }
 
 func defaultValidationUsernameFunc(userName string) error {
-	const re = `\w{5,}`
+	const re = `^\w{5,}$`
 
 	if !regexp.MustCompile(re).MatchString(userName) {
 		return fmt.Errorf("username does not match %s", re)
