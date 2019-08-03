@@ -172,7 +172,7 @@ func TestPublicRooms(t *testing.T) {
 	err = user2.JoinRoom(room2)
 	assert.NoError(t, err)
 
-	rooms := backend.PublicRooms()
+	rooms := backend.PublicRooms("")
 	assert.Len(t, rooms, 2)
 	assert.Equal(t, rooms[0], room2)
 	assert.Equal(t, rooms[1], room1)
