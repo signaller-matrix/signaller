@@ -17,7 +17,8 @@ func TestCreateRoom(t *testing.T) {
 	request := createroom.Request{
 		RoomAliasName: "room1",
 		Name:          "room1",
-		Topic:         "topic"}
+		Topic:         "topic",
+		Preset:        createroom.PublicChat}
 
 	room, err := user.CreateRoom(request)
 	assert.NoError(t, err)
@@ -25,6 +26,7 @@ func TestCreateRoom(t *testing.T) {
 	assert.Equal(t, request.Name, room.Name())
 	assert.Equal(t, request.Topic, room.Topic())
 	assert.Equal(t, user.ID(), room.Creator().ID())
+	assert.Equal(t, request.Preset, room.State())
 	assert.Equal(t, 1, len(backend.rooms))
 	assert.Equal(t, "!"+room.(*Room).id+":"+backend.hostname, room.ID())
 }
