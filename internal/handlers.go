@@ -323,6 +323,61 @@ func CapabilitiesHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
+func AddFilterHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+	token := getTokenFromResponse(r)
+	if token == "" {
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+		return
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	var request common.Filter
+	getRequest(r, &request)
+
+	filterID := RandomString(12)
+	user.AddFilter(filterID, request)
+
+	sendJsonResponse(w, http.StatusOK, map[string]interface{}{
+		"filter_id": filterID,
+	})
+}
+
+func GetFilterHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
+		return
+	}
+
+	token := getTokenFromResponse(r)
+	if token == "" {
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+		return
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	filter := user.GetFilterByID(mux.Vars(r)["filterID"])
+	if filter == nil {
+		errorResponse(w, models.M_INVALID_PARAM, http.StatusNotFound, "")
+	}
+
+	sendJsonResponse(w, http.StatusOK, filter)
+}
+
 // https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-devices
 func DevicesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {

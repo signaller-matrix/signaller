@@ -6,6 +6,7 @@ import (
 
 	"github.com/signaller-matrix/signaller/internal"
 	"github.com/signaller-matrix/signaller/internal/models"
+	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/devices"
 	"github.com/signaller-matrix/signaller/internal/models/rooms"
@@ -15,6 +16,7 @@ type User struct {
 	name     string
 	password string
 	Tokens   map[string]Token
+	filters  map[string]common.Filter
 
 	backend *Backend
 
@@ -48,7 +50,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 	events = append(events, RoomEvent{
 		Content:        nil,
 		Type:           rooms.Create,
-		EventID:        newToken(eventIDSize),
+		EventID:        internal.RandomString(eventIDSize),
 		Sender:         user,
 		OriginServerTS: t})
 
@@ -58,7 +60,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 	events = append(events, RoomEvent{
 		Content:        []byte(request.Visibility), // TODO: check visibility vs join rules
 		Type:           rooms.JoinRules,
-		EventID:        newToken(eventIDSize),
+		EventID:        internal.RandomString(eventIDSize),
 		Sender:         user,
 		OriginServerTS: t})
 
@@ -67,7 +69,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 		events = append(events, RoomEvent{
 			Content:        nil, // TODO: add
 			Type:           rooms.Name,
-			EventID:        newToken(eventIDSize),
+			EventID:        internal.RandomString(eventIDSize),
 			Sender:         user,
 			OriginServerTS: t})
 	}
@@ -77,13 +79,13 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 		events = append(events, RoomEvent{
 			Content:        nil, // TODO: add
 			Type:           rooms.CanonicalAlias,
-			EventID:        newToken(eventIDSize),
+			EventID:        internal.RandomString(eventIDSize),
 			Sender:         user,
 			OriginServerTS: t})
 	}
 
 	room := &Room{
-		id:         newToken(groupIDSize),
+		id:         internal.RandomString(groupIDSize),
 		aliasName:  request.RoomAliasName,
 		name:       request.Name,
 		topic:      request.Topic,
@@ -190,7 +192,7 @@ func (user *User) SendMessage(room internal.Room, text string) models.ApiError {
 	room.(*Room).events = append(room.(*Room).events, RoomEvent{
 		Content:        nil,
 		Type:           rooms.Message,
-		EventID:        newToken(defaultTokenSize),
+		EventID:        internal.RandomString(defaultTokenSize),
 		Sender:         user,
 		OriginServerTS: time.Now(),
 		Room:           room})
@@ -273,5 +275,16 @@ func (user *User) JoinRoom(room internal.Room) models.ApiError {
 
 	memRoom.joined = append(memRoom.joined, user)
 
+	return nil
+}
+
+func (user *User) AddFilter(filterID string, filter common.Filter) {
+	user.filters[filterID] = filter
+}
+
+func (user *User) GetFilterByID(filterID string) *common.Filter {
+	if val, ok := user.filters[filterID]; ok {
+		return &val
+	}
 	return nil
 }

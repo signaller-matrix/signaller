@@ -73,7 +73,7 @@ func (backend *Backend) Login(username, password, device string) (user internal.
 		return nil, "", models.NewError(models.M_FORBIDDEN, "wrong password")
 	}
 
-	token = newToken(defaultTokenSize)
+	token = internal.RandomString(defaultTokenSize)
 
 	backend.data[username].(*User).Tokens[token] = Token{Device: device}
 

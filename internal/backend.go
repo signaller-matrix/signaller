@@ -2,6 +2,7 @@ package internal
 
 import (
 	"github.com/signaller-matrix/signaller/internal/models"
+	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/devices"
 	"github.com/signaller-matrix/signaller/internal/models/rooms"
@@ -50,4 +51,6 @@ type User interface {
 	LogoutAll()
 	JoinRoom(Room) models.ApiError
 	Invite(Room, User) models.ApiError
+	AddFilter(filterID string, filter common.Filter)
+	GetFilterByID(filterID string) *common.Filter
 }
