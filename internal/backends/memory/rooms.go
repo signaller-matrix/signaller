@@ -21,6 +21,7 @@ type Room struct {
 
 	creator internal.User
 	joined  []internal.User
+	invites []internal.User
 
 	events []RoomEvent
 

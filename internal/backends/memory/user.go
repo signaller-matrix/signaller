@@ -122,6 +122,42 @@ func (user *User) SetTopic(room internal.Room, topic string) models.ApiError {
 	return nil
 }
 
+func (user *User) Invite(room internal.Room, invitee internal.User) models.ApiError {
+	memRoom := room.(*Room)
+
+	memRoom.mutex.Lock()
+	defer memRoom.mutex.Unlock()
+
+	userInRoom := false
+
+	for _, roomUser := range memRoom.joined {
+		if user.ID() == roomUser.ID() {
+			userInRoom = true
+		}
+	}
+
+	if !userInRoom {
+		return models.NewError(models.M_FORBIDDEN, "the inviter is not currently in the room") // TODO: check code
+	}
+
+	// TODO: remove repeated cycle
+	for _, roomUser := range memRoom.joined {
+		if roomUser.ID() == invitee.ID() {
+			return models.NewError(models.M_FORBIDDEN, "the invitee is already a member of the room.") // TODO: check code
+		}
+	}
+
+	for _, inviteeUser := range memRoom.invites {
+		if inviteeUser.ID() == invitee.ID() {
+			return models.NewError(models.M_FORBIDDEN, "user already has been invited") // TODO: check code
+		}
+	}
+
+	memRoom.invites = append(memRoom.invites, invitee) // TODO: add invite event + info about inviter
+
+	return nil
+}
+
 func (user *User) LeaveRoom(room internal.Room) models.ApiError {
 	room.(*Room).mutex.Lock()
 	defer room.(*Room).mutex.Unlock()

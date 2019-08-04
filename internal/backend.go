@@ -49,4 +49,5 @@ type User interface {
 	Logout(token string)
 	LogoutAll()
 	JoinRoom(Room) models.ApiError
+	Invite(Room, User) models.ApiError
 }

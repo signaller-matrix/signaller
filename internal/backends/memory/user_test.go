@@ -192,3 +192,25 @@ func TestLogoutAll(t *testing.T) {
 
 	assert.Len(t, user.Devices(), 0)
 }
+
+func TestInviteUser(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user1, _, err := backend.Register("username1", "", "")
+	assert.NoError(t, err)
+
+	user2, _, err := backend.Register("username2", "", "")
+	assert.NoError(t, err)
+
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1"}
+
+	room, err := user1.CreateRoom(request)
+	assert.NoError(t, err)
+	assert.Len(t, room.(*Room).invites, 0)
+
+	err = user1.Invite(room, user2)
+	assert.NoError(t, err)
+	assert.Len(t, room.(*Room).invites, 1)
+}

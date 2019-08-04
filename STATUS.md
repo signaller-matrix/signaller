@@ -97,7 +97,7 @@ Implemented from [Client-Server API](https://matrix.org/docs/spec/client_server/
 
 - [x] [10.4.1 GET /_matrix/client/r0/joined_rooms](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-joined-rooms)
 
-- [ ] [10.4.2.1 POST /_matrix/client/r0/rooms/{roomId}/invite](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-invite)
+- [ ] **[10.4.2.1 POST /_matrix/client/r0/rooms/{roomId}/invite](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-invite)**
 - [ ] [10.4.2.2 POST /_matrix/client/r0/rooms/{roomId}/join](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-rooms-roomid-join)
 - [ ] [10.4.2.3 POST /_matrix/client/r0/join/{roomIdOrAlias}](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-join-roomidoralias)
 
