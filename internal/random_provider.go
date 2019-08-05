@@ -1,12 +1,12 @@
-package memory
+package internal
 
 import (
 	"crypto/rand"
 	"fmt"
 )
 
-// newToken returns new generated token with specified length
-func newToken(size int) string {
+// RandomString returns new generated token with specified length
+func RandomString(size int) string {
 	b := make([]byte, size)
 	rand.Read(b) // TODO: check may be can be error
 

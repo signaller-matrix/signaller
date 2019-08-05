@@ -1,4 +1,4 @@
-module github.com/nxshock/signaller
+module github.com/signaller-matrix/signaller
 
 go 1.12
 
