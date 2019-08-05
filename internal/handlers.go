@@ -324,7 +324,7 @@ func CapabilitiesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddFilterHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
 		return
 	}

@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/signaller-matrix/signaller/internal/models/common"
+
 	"github.com/signaller-matrix/signaller/internal"
 	"github.com/signaller-matrix/signaller/internal/models"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
@@ -52,7 +54,8 @@ func (backend *Backend) Register(username, password, device string) (user intern
 		name:     username,
 		password: password,
 		Tokens:   make(map[string]Token),
-		backend:  backend}
+		backend:  backend,
+		filters:  make(map[string]common.Filter)}
 
 	backend.data[username] = user
 
