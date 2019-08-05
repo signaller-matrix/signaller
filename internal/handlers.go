@@ -351,7 +351,7 @@ func AddFilterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filterID := RandomString(12)
-	user.AddFilter(filterID, request)
+	user.AddFilter(filterID, common.Filter(request))
 
 	response := filter.Response{FilterID: filterID}
 

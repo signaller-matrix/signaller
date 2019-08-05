@@ -6,9 +6,9 @@ import (
 
 	"github.com/signaller-matrix/signaller/internal"
 	"github.com/signaller-matrix/signaller/internal/models"
+	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/devices"
-	"github.com/signaller-matrix/signaller/internal/models/filter"
 	"github.com/signaller-matrix/signaller/internal/models/rooms"
 )
 
@@ -16,7 +16,7 @@ type User struct {
 	name     string
 	password string
 	Tokens   map[string]Token
-	filters  map[string]filter.Request
+	filters  map[string]common.Filter
 
 	backend *Backend
 
@@ -278,14 +278,14 @@ func (user *User) JoinRoom(room internal.Room) models.ApiError {
 	return nil
 }
 
-func (user *User) AddFilter(filterID string, filterReq filter.Request) {
+func (user *User) AddFilter(filterID string, filter common.Filter) {
 	user.mutex.Lock()
 	defer user.mutex.Unlock()
 
-	user.filters[filterID] = filterReq
+	user.filters[filterID] = filter
 }
 
-func (user *User) GetFilterByID(filterID string) *filter.Request {
+func (user *User) GetFilterByID(filterID string) *common.Filter {
 	user.mutex.RLock()
 	defer user.mutex.RUnlock()
 
