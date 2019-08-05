@@ -14,6 +14,7 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/capabilities"
 	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/devices"
+	"github.com/signaller-matrix/signaller/internal/models/filter"
 	"github.com/signaller-matrix/signaller/internal/models/joinedrooms"
 	"github.com/signaller-matrix/signaller/internal/models/listroom"
 	"github.com/signaller-matrix/signaller/internal/models/login"
@@ -323,6 +324,7 @@ func CapabilitiesHandler(w http.ResponseWriter, r *http.Request) {
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
+//
 func AddFilterHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "wrong method: "+r.Method)
@@ -341,15 +343,19 @@ func AddFilterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var request common.Filter
-	getRequest(r, &request)
+	var request filter.Request
+	err := getRequest(r, &request)
+	if err != nil {
+		errorResponse(w, models.M_BAD_JSON, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	filterID := RandomString(12)
 	user.AddFilter(filterID, request)
 
-	sendJsonResponse(w, http.StatusOK, map[string]interface{}{
-		"filter_id": filterID,
-	})
+	response := filter.Response{FilterID: filterID}
+
+	sendJsonResponse(w, http.StatusOK, response)
 }
 
 func GetFilterHandler(w http.ResponseWriter, r *http.Request) {
@@ -373,6 +379,7 @@ func GetFilterHandler(w http.ResponseWriter, r *http.Request) {
 	filter := user.GetFilterByID(mux.Vars(r)["filterID"])
 	if filter == nil {
 		errorResponse(w, models.M_INVALID_PARAM, http.StatusNotFound, "")
+		return
 	}
 
 	sendJsonResponse(w, http.StatusOK, filter)
