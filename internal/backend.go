@@ -18,6 +18,7 @@ type Backend interface {
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err models.ApiError)
 	PublicRooms(filter string) []Room
 	ValidateUsernameFunc() func(string) error
+	GetRoomByAlias(string) Room
 }
 
 type Room interface {
@@ -53,4 +54,6 @@ type User interface {
 	Invite(Room, User) models.ApiError
 	AddFilter(filterID string, filter common.Filter)
 	GetFilterByID(filterID string) *common.Filter
+	AddRoomAlias(Room, string) models.ApiError
+	DeleteRoomAlias(string) models.ApiError
 }

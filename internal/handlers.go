@@ -22,6 +22,7 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/publicrooms"
 	"github.com/signaller-matrix/signaller/internal/models/register"
 	"github.com/signaller-matrix/signaller/internal/models/registeravailable"
+	"github.com/signaller-matrix/signaller/internal/models/roomalias"
 	mSync "github.com/signaller-matrix/signaller/internal/models/sync"
 	"github.com/signaller-matrix/signaller/internal/models/versions"
 	"github.com/signaller-matrix/signaller/internal/models/whoami"
@@ -535,6 +536,76 @@ func publicRoomsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	sendJsonResponse(w, http.StatusOK, response)
+}
+
+// https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-directory-room-roomalias
+// https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-directory-room-roomalias
+// https://matrix.org/docs/spec/client_server/latest#delete-matrix-client-r0-directory-room-roomalias
+func roomAliasHandler(w http.ResponseWriter, r *http.Request) {
+	roomAlias := mux.Vars(r)["roomAlias"] // TODO: add validation of room alias
+
+	var user User
+
+	if r.Method == http.MethodPut || r.Method == http.MethodDelete {
+		token := getTokenFromResponse(r)
+		if token == "" {
+			errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+			return
+		}
+
+		user = currServer.Backend.GetUserByToken(token)
+		if user == nil {
+			errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+			return
+		}
+	}
+
+	var request roomalias.Request
+	err := getRequest(r, &request)
+	if err != nil {
+		errorResponse(w, models.M_BAD_JSON, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var response interface{}
+
+	switch r.Method {
+	case http.MethodGet:
+		room := currServer.Backend.GetRoomByAlias(roomAlias)
+		if room == nil {
+			errorResponse(w, models.M_NOT_FOUND, http.StatusNotFound, "room not found")
+			return
+		}
+
+		response = roomalias.ResponseGet{
+			RoomID:  room.ID(),
+			Servers: []string{currServer.Address}}
+
+	case http.MethodPut:
+		room := currServer.Backend.GetRoomByID(request.RoomID)
+		if room == nil {
+			errorResponse(w, models.M_NOT_FOUND, http.StatusNotFound, "room not found")
+			return
+		}
+
+		err := user.AddRoomAlias(room, roomAlias)
+		if err != nil {
+			errorResponse(w, err, http.StatusConflict, "") // TODO: check http code
+			return
+		}
+
+		response = struct{}{}
+	case http.MethodDelete:
+		err := user.DeleteRoomAlias(roomAlias)
+		if err != nil {
+			errorResponse(w, err, http.StatusConflict, "") // TODO: check http code
+			return
+		}
+
+		response = struct{}{}
+	}
+
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
