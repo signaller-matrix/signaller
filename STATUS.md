@@ -50,13 +50,10 @@ Implemented from [Client-Server API](https://matrix.org/docs/spec/client_server/
 
 ## [8 Filtering](https://matrix.org/docs/spec/client_server/latest#filtering)
 
-- [x] [8.2.1 POST /_matrix/client/r0/user/{userId}/filter](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-user-userid-filter)
-- [x] [8.2.2 GET /_matrix/client/r0/user/{userId}/filter/{filterId}](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-user-userid-filter-filterid)
-
 ### [8.2 API endpoints](https://matrix.org/docs/spec/client_server/latest#api-endpoints)
 
-- [ ] [8.2.1 POST /_matrix/client/r0/user/{userId}/filter](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-user-userid-filter)
-- [ ] [8.2.2 GET /_matrix/client/r0/user/{userId}/filter/{filterId}](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-user-userid-filter-filterid)
+- [x] [8.2.1 POST /_matrix/client/r0/user/{userId}/filter](https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-user-userid-filter)
+- [x] [8.2.2 GET /_matrix/client/r0/user/{userId}/filter/{filterId}](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-user-userid-filter-filterid)
 
 ### [9.4 Syncing](https://matrix.org/docs/spec/client_server/latest#syncing)
 
