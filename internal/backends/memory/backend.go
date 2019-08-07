@@ -19,6 +19,7 @@ type Backend struct {
 	data                 map[string]internal.User
 	rooms                map[string]internal.Room
 	events               map[string]rooms.Event
+	roomAliases          map[string]internal.Room
 	hostname             string
 	validateUsernameFunc func(string) error // TODO: create ability to redefine validation func
 	mutex                sync.RWMutex
@@ -33,6 +34,7 @@ func NewBackend(hostname string) *Backend {
 		hostname:             hostname,
 		validateUsernameFunc: defaultValidationUsernameFunc,
 		rooms:                make(map[string]internal.Room),
+		roomAliases:          make(map[string]internal.Room),
 		data:                 make(map[string]internal.User)}
 }
 
@@ -148,6 +150,20 @@ func (backend *Backend) PublicRooms(filter string) []internal.Room {
 	sort.Sort(BySize(rooms))
 
 	return rooms
+}
+
+func (backend *Backend) GetRoomByAlias(alias string) internal.Room {
+	backend.mutex.RLock()
+	defer backend.mutex.RUnlock()
+
+	alias = strings.TrimPrefix(alias, "#") // TODO: create strip alias func
+	alias = strings.TrimSuffix(alias, ":"+backend.hostname)
+
+	if room, exists := backend.roomAliases[alias]; exists {
+		return room
+	}
+
+	return nil
 }
 
 func (backend *Backend) ValidateUsernameFunc() func(string) error {

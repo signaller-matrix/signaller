@@ -20,6 +20,7 @@ type Backend interface {
 	ValidateUsernameFunc() func(string) error
 	GetEventByID(id string) rooms.Event
 	PutEvent(rooms.Event) error
+	GetRoomByAlias(string) Room
 }
 
 type Room interface {
@@ -54,4 +55,6 @@ type User interface {
 	Invite(Room, User) models.ApiError
 	AddFilter(filterID string, filter common.Filter)
 	GetFilterByID(filterID string) *common.Filter
+	AddRoomAlias(Room, string) models.ApiError
+	DeleteRoomAlias(string) models.ApiError
 }

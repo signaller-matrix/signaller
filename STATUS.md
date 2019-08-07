@@ -89,9 +89,9 @@ Implemented from [Client-Server API](https://matrix.org/docs/spec/client_server/
 
 ### [10.2 Room aliases](https://matrix.org/docs/spec/client_server/latest#room-aliases)
 
-- [ ] [10.2.1 PUT /_matrix/client/r0/directory/room/{roomAlias}](https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-directory-room-roomalias)
-- [ ] [10.2.2 GET /_matrix/client/r0/directory/room/{roomAlias}](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-directory-room-roomalias)
-- [ ] [10.2.3 DELETE /_matrix/client/r0/directory/room/{roomAlias}](https://matrix.org/docs/spec/client_server/latest#delete-matrix-client-r0-directory-room-roomalias)
+- [x] [10.2.1 PUT /_matrix/client/r0/directory/room/{roomAlias}](https://matrix.org/docs/spec/client_server/latest#put-matrix-client-r0-directory-room-roomalias)
+- [x] [10.2.2 GET /_matrix/client/r0/directory/room/{roomAlias}](https://matrix.org/docs/spec/client_server/latest#get-matrix-client-r0-directory-room-roomalias)
+- [x] [10.2.3 DELETE /_matrix/client/r0/directory/room/{roomAlias}](https://matrix.org/docs/spec/client_server/latest#delete-matrix-client-r0-directory-room-roomalias)
 
 ### [10.4 Room membership](https://matrix.org/docs/spec/client_server/latest#room-membership)
 

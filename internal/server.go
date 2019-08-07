@@ -42,6 +42,7 @@ func NewServer(port int) (*Server, error) {
 	router.HandleFunc("/_matrix/client/r0/publicRooms", publicRoomsHandler)
 	router.HandleFunc("/_matrix/client/r0/user/{userId}/filter/{filterID}", GetFilterHandler).Methods("GET")
 	router.HandleFunc("/_matrix/client/r0/user/{userId}/filter", AddFilterHandler).Methods("POST")
+	router.HandleFunc("/_matrix/client/r0/directory/room/{roomAlias}", roomAliasHandler).Methods(http.MethodPut, http.MethodGet, http.MethodDelete)
 
 	router.HandleFunc("/", RootHandler)
 

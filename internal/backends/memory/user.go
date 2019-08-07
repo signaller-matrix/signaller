@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -282,6 +283,41 @@ func (user *User) JoinRoom(room internal.Room) models.ApiError {
 	}
 
 	memRoom.joined = append(memRoom.joined, user)
+
+	return nil
+}
+
+func (user *User) AddRoomAlias(room internal.Room, alias string) models.ApiError {
+	user.backend.mutex.Lock()
+	defer user.backend.mutex.Unlock()
+
+	if room.Creator().ID() != user.ID() {
+		return models.NewError(models.M_FORBIDDEN, "only room creator can add room alias") // TODO: make room admins can use this method
+	}
+
+	if _, exists := user.backend.roomAliases[alias]; exists {
+		return models.NewError(models.M_UNKNOWN, fmt.Sprintf("room alias #%s:%s already exists", alias, user.backend.hostname))
+	}
+
+	user.backend.roomAliases[alias] = room
+
+	return nil
+}
+
+func (user *User) DeleteRoomAlias(alias string) models.ApiError {
+	user.backend.mutex.Lock()
+	defer user.backend.mutex.Unlock()
+
+	room := user.backend.GetRoomByAlias(alias)
+	if room == nil {
+		return models.NewError(models.M_NOT_FOUND, "room not found")
+	}
+
+	if room.Creator().ID() != user.ID() {
+		return models.NewError(models.M_FORBIDDEN, "only room creator can delete room alias") // TODO: make room admins can use this method
+	}
+
+	delete(user.backend.roomAliases, alias)
 
 	return nil
 }

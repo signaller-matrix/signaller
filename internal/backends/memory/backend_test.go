@@ -177,3 +177,14 @@ func TestPublicRooms(t *testing.T) {
 	assert.Equal(t, rooms[0], room2)
 	assert.Equal(t, rooms[1], room1)
 }
+
+func TestNewUserNameValidate(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	var shortName = "u1"
+
+	user, token, err := backend.Register(shortName, "", "")
+	assert.Error(t, err)
+	assert.Nil(t, user)
+	assert.Empty(t, token)
+}
