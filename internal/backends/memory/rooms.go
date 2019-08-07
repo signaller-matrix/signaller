@@ -5,7 +5,6 @@ import (
 
 	"github.com/signaller-matrix/signaller/internal"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
-	"github.com/signaller-matrix/signaller/internal/models/rooms"
 )
 
 type Room struct {
@@ -22,8 +21,6 @@ type Room struct {
 	creator internal.User
 	joined  []internal.User
 	invites []internal.User
-
-	events []RoomEvent
 
 	server *Backend
 
@@ -63,18 +60,6 @@ func (room *Room) Users() []internal.User {
 	defer room.mutex.RUnlock()
 
 	return room.joined
-}
-
-func (room *Room) Events() []rooms.Event {
-	room.mutex.RLock()
-	defer room.mutex.RUnlock()
-
-	result := make([]rooms.Event, 0)
-	for _, v := range room.events {
-		result = append(result, v.ToEvent())
-	}
-
-	return result
 }
 
 func (room *Room) Visibility() createroom.VisibilityType {
