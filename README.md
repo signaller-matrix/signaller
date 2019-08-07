@@ -1,4 +1,4 @@
-# Signaller
+# ![logo](https://github.com/signaller-matrix/signaller/raw/master/logo/logo32.png) Signaller
 
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![Build Status](https://travis-ci.com/signaller-matrix/signaller.svg?branch=master)](https://travis-ci.com/signaller-matrix/signaller)
