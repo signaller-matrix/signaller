@@ -18,6 +18,8 @@ type Backend interface {
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err models.ApiError)
 	PublicRooms(filter string) []Room
 	ValidateUsernameFunc() func(string) error
+	GetEventByID(id string) rooms.Event
+	PutEvent(rooms.Event) error
 }
 
 type Room interface {
@@ -27,7 +29,6 @@ type Room interface {
 	AliasName() string
 	Name() string
 	Topic() string
-	Events() []rooms.Event
 	Visibility() createroom.VisibilityType
 	WorldReadable() bool
 	GuestCanJoin() bool
