@@ -11,12 +11,14 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models"
 	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
+	"github.com/signaller-matrix/signaller/internal/models/rooms"
 	mSync "github.com/signaller-matrix/signaller/internal/models/sync"
 )
 
 type Backend struct {
 	data                 map[string]internal.User
 	rooms                map[string]internal.Room
+	events               map[string]rooms.Event
 	roomAliases          map[string]internal.Room
 	hostname             string
 	validateUsernameFunc func(string) error // TODO: create ability to redefine validation func
@@ -177,6 +179,22 @@ func defaultValidationUsernameFunc(userName string) error {
 	if !regexp.MustCompile(re).MatchString(userName) {
 		return fmt.Errorf("username does not match %s", re)
 	}
+
+	return nil
+}
+
+func (backend *Backend) GetEventByID(id string) rooms.Event {
+	backend.mutex.RLock()
+	defer backend.mutex.RUnlock()
+
+	return backend.events[id]
+}
+
+func (backend *Backend) PutEvent(event rooms.Event) error {
+	backend.mutex.RLock()
+	defer backend.mutex.RUnlock()
+
+	backend.events[event.EventID] = event
 
 	return nil
 }

@@ -90,16 +90,19 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 		aliasName:  request.RoomAliasName,
 		name:       request.Name,
 		topic:      request.Topic,
-		events:     events,
 		creator:    user,
 		joined:     []internal.User{user},
 		visibility: request.Visibility,
 		server:     user.backend,
 		state:      request.Preset}
 
-	for i, _ := range room.events {
-		room.events[i].Room = room
+	for i, _ := range events {
+		events[i].Room = room
 		//v.Room = room
+	}
+
+	for i, _ := range events {
+		user.backend.PutEvent(events[i].ToEvent())
 	}
 
 	user.backend.rooms[room.ID()] = room
@@ -116,11 +119,14 @@ func (user *User) SetTopic(room internal.Room, topic string) models.ApiError {
 	}
 
 	room.(*Room).topic = topic
-	room.(*Room).events = append(room.(*Room).events, RoomEvent{
+
+	rEvent := &RoomEvent{
 		Type:           rooms.Topic,
 		Sender:         user,
 		OriginServerTS: time.Now(),
-		Room:           room})
+		Room:           room}
+
+	user.backend.PutEvent(rEvent.ToEvent())
 
 	return nil
 }
@@ -190,13 +196,15 @@ func (user *User) SendMessage(room internal.Room, text string) models.ApiError {
 		return models.NewError(models.M_FORBIDDEN, "")
 	}
 
-	room.(*Room).events = append(room.(*Room).events, RoomEvent{
+	rEvent := &RoomEvent{
 		Content:        nil,
 		Type:           rooms.Message,
 		EventID:        internal.RandomString(defaultTokenSize),
 		Sender:         user,
 		OriginServerTS: time.Now(),
-		Room:           room})
+		Room:           room}
+
+	user.backend.PutEvent(rEvent.ToEvent())
 
 	return nil
 }
