@@ -191,8 +191,8 @@ func (backend *Backend) GetEventByID(id string) rooms.Event {
 }
 
 func (backend *Backend) PutEvent(event rooms.Event) error {
-	backend.mutex.RLock()
-	defer backend.mutex.RUnlock()
+	backend.mutex.Lock()
+	defer backend.mutex.Unlock()
 
 	backend.events[event.EventID] = event
 
