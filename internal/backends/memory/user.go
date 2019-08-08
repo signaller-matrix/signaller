@@ -114,13 +114,15 @@ func (user *User) SetTopic(room internal.Room, topic string) models.ApiError {
 	memRoom := room.(*Room)
 
 	memRoom.mutex.Lock()
-	defer memRoom.mutex.Unlock()
 
 	if memRoom.creator.ID() != user.ID() { // TODO: currently only creator can change topic
+		memRoom.mutex.Unlock()
 		return models.NewError(models.M_FORBIDDEN, "")
 	}
 
 	memRoom.topic = topic
+
+	memRoom.mutex.Unlock()
 
 	rEvent := &RoomEvent{
 		Type:           rooms.Topic,
