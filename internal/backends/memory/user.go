@@ -190,8 +190,8 @@ func (user *User) LeaveRoom(room internal.Room) models.ApiError {
 func (user *User) SendMessage(room internal.Room, text string) models.ApiError {
 	memRoom := room.(*Room)
 
-	memRoom.mutex.Lock()
-	defer memRoom.mutex.Unlock()
+	memRoom.mutex.RLock()
+	defer memRoom.mutex.RUnlock()
 
 	userInRoom := false
 	for _, roomMember := range memRoom.joined {
