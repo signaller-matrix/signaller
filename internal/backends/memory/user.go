@@ -111,14 +111,16 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 }
 
 func (user *User) SetTopic(room internal.Room, topic string) models.ApiError {
-	room.(*Room).mutex.Lock()
-	defer room.(*Room).mutex.Unlock()
+	memRoom := room.(*Room)
 
-	if room.(*Room).creator.ID() != user.ID() { // TODO: currently only creator can change topic
+	memRoom.mutex.Lock()
+	defer memRoom.mutex.Unlock()
+
+	if memRoom.creator.ID() != user.ID() { // TODO: currently only creator can change topic
 		return models.NewError(models.M_FORBIDDEN, "")
 	}
 
-	room.(*Room).topic = topic
+	memRoom.topic = topic
 
 	rEvent := &RoomEvent{
 		Type:           rooms.Topic,
@@ -168,8 +170,10 @@ func (user *User) Invite(room internal.Room, invitee internal.User) models.ApiEr
 }
 
 func (user *User) LeaveRoom(room internal.Room) models.ApiError {
-	room.(*Room).mutex.Lock()
-	defer room.(*Room).mutex.Unlock()
+	memRoom := room.(*Room)
+
+	memRoom.mutex.Lock()
+	defer memRoom.mutex.Unlock()
 
 	for i, roomMember := range room.(*Room).joined {
 		if roomMember.ID() == user.ID() {
@@ -182,11 +186,13 @@ func (user *User) LeaveRoom(room internal.Room) models.ApiError {
 }
 
 func (user *User) SendMessage(room internal.Room, text string) models.ApiError {
-	room.(*Room).mutex.Lock()
-	defer room.(*Room).mutex.Unlock()
+	memRoom := room.(*Room)
+
+	memRoom.mutex.Lock()
+	defer memRoom.mutex.Unlock()
 
 	userInRoom := false
-	for _, roomMember := range room.(*Room).joined {
+	for _, roomMember := range memRoom.joined {
 		if roomMember.ID() == user.ID() {
 			userInRoom = true
 		}
@@ -247,10 +253,12 @@ func (user *User) SetRoomVisibility(room internal.Room, visibilityType createroo
 		return models.NewError(models.M_FORBIDDEN, "only room owner can change visibility") // TODO: room administrators can use this method too
 	}
 
-	room.(*Room).mutex.Lock()
-	defer room.(*Room).mutex.Unlock()
+	memRoom := room.(*Room)
 
-	room.(*Room).visibility = visibilityType
+	memRoom.mutex.Lock()
+	defer memRoom.mutex.Unlock()
+
+	memRoom.visibility = visibilityType
 
 	return nil
 }
@@ -263,6 +271,9 @@ func (user *User) ChangePassword(newPassword string) {
 }
 
 func (user *User) Logout(token string) {
+	user.mutex.Lock()
+	defer user.mutex.Unlock()
+
 	delete(user.Tokens, token)
 }
 

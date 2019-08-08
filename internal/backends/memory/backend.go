@@ -35,6 +35,7 @@ func NewBackend(hostname string) *Backend {
 		validateUsernameFunc: defaultValidationUsernameFunc,
 		rooms:                make(map[string]internal.Room),
 		roomAliases:          make(map[string]internal.Room),
+		events:               make(map[string]rooms.Event),
 		data:                 make(map[string]internal.User)}
 }
 
