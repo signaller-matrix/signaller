@@ -123,3 +123,27 @@ func TestRoomUserCount(t *testing.T) {
 
 	// TODO: add join another user test
 }
+
+func TestRoomAliases(t *testing.T) {
+	backend := NewBackend("localhost")
+
+	user1, _, err := backend.Register("user1", "", "")
+	assert.NoError(t, err)
+
+	request := createroom.Request{
+		RoomAliasName: "room1",
+		Name:          "room1",
+		Topic:         "topic"}
+
+	room, err := user1.CreateRoom(request)
+	assert.NoError(t, err)
+	assert.NotNil(t, room)
+
+	var expecterRoomAliases = []string{"alias1", "alias2"}
+	for _, alias := range expecterRoomAliases {
+		err := user1.AddRoomAlias(room, alias)
+		assert.NoError(t, err)
+	}
+
+	assert.Equal(t, expecterRoomAliases, room.Aliases())
+}
