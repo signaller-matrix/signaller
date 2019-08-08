@@ -28,6 +28,7 @@ type Room interface {
 	Creator() User
 	Users() []User
 	AliasName() string
+	Aliases() []string
 	Name() string
 	Topic() string
 	Visibility() createroom.VisibilityType

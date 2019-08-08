@@ -48,6 +48,20 @@ func (room *Room) AliasName() string {
 	return room.aliasName
 }
 
+func (room *Room) Aliases() []string {
+	room.server.mutex.RLock()
+	defer room.server.mutex.RUnlock()
+
+	var aliases []string
+	for alias, serverRoom := range room.server.roomAliases {
+		if serverRoom.ID() == room.ID() {
+			aliases = append(aliases, "#"+alias+":"+room.server.hostname)
+		}
+	}
+
+	return aliases
+}
+
 func (room *Room) Topic() string {
 	room.mutex.RLock()
 	defer room.mutex.RUnlock()

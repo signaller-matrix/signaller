@@ -156,8 +156,7 @@ func (backend *Backend) GetRoomByAlias(alias string) internal.Room {
 	backend.mutex.RLock()
 	defer backend.mutex.RUnlock()
 
-	alias = strings.TrimPrefix(alias, "#") // TODO: create strip alias func
-	alias = strings.TrimSuffix(alias, ":"+backend.hostname)
+	alias = internal.StripAlias(backend.hostname, alias)
 
 	if room, exists := backend.roomAliases[alias]; exists {
 		return room

@@ -1,13 +1,28 @@
 package internal
 
-import "github.com/signaller-matrix/signaller/internal/models/publicrooms"
+import (
+	"strings"
+
+	"github.com/signaller-matrix/signaller/internal/models/publicrooms"
+)
+
+func GetCanonicalAlias(hostName string, alias string) string {
+	return "#" + alias + ":" + hostName
+}
+
+func StripAlias(hostName string, canonicalAlias string) string {
+	canonicalAlias = strings.TrimPrefix(canonicalAlias, "#")
+	canonicalAlias = strings.TrimSuffix(canonicalAlias, ":"+hostName)
+
+	return canonicalAlias
+}
 
 func roomsToPublicRoomsChunks(rooms []Room) []publicrooms.PublicRoomsChunk {
 	var chunks []publicrooms.PublicRoomsChunk
 
 	for _, room := range rooms {
 		chunk := publicrooms.PublicRoomsChunk{
-			// TODO: Aliases:
+			Aliases:          room.Aliases(),
 			CanonicalAlias:   room.AliasName(),
 			Name:             room.Name(),
 			NumJoinedMembers: len(room.Users()),

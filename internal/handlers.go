@@ -572,7 +572,7 @@ func roomAliasHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		room := currServer.Backend.GetRoomByAlias(roomAlias)
+		room := currServer.Backend.GetRoomByAlias(StripAlias(currServer.Address, roomAlias))
 		if room == nil {
 			errorResponse(w, models.M_NOT_FOUND, http.StatusNotFound, "room not found")
 			return
@@ -597,7 +597,7 @@ func roomAliasHandler(w http.ResponseWriter, r *http.Request) {
 
 		response = struct{}{}
 	case http.MethodDelete:
-		err := user.DeleteRoomAlias(roomAlias)
+		err := user.DeleteRoomAlias(StripAlias(currServer.Address, roomAlias))
 		if err != nil {
 			errorResponse(w, err, http.StatusConflict, "") // TODO: check http code
 			return
