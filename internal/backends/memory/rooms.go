@@ -55,7 +55,7 @@ func (room *Room) Aliases() []string {
 	var aliases []string
 	for alias, serverRoom := range room.server.roomAliases {
 		if serverRoom.ID() == room.ID() {
-			aliases = append(aliases, "#"+alias+":"+room.server.hostname)
+			aliases = append(aliases, alias)
 		}
 	}
 
