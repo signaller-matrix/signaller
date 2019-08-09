@@ -21,7 +21,7 @@ type Backend interface {
 	GetEventByID(id string) rooms.Event
 	PutEvent(rooms.Event) error
 	GetRoomByAlias(string) Room
-	GetEventsSince(sinceToken string, limit int) []rooms.Event
+	GetEventsSince(user User, sinceToken string, limit int) []rooms.Event
 }
 
 type Room interface {

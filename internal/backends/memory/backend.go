@@ -201,7 +201,7 @@ func (backend *Backend) PutEvent(event rooms.Event) error {
 	return nil
 }
 
-func (backend *Backend) GetEventsSince(user User, sinceToken string, limit int) []rooms.Event {
+func (backend *Backend) GetEventsSince(user internal.User, sinceToken string, limit int) []rooms.Event {
 	sinceEventNode := backend.events.GetByKey(sinceToken)
 	sEvents := backend.events.GetByScoreRange(sinceEventNode.Score(), -1, &sortedset.GetByScoreRangeOptions{
 		Limit: limit,
@@ -228,7 +228,7 @@ func extractEventsFromNodes(nodes []*sortedset.SortedSetNode) []rooms.Event {
 	return events
 }
 
-func isEventRelatedToUser(event rooms.Event, user User) bool {
+func isEventRelatedToUser(event rooms.Event, user internal.User) bool {
 	if internal.InArray(event.RoomID, extractRoomIDsFromModel(user.JoinedRooms())) {
 		return true
 	}
