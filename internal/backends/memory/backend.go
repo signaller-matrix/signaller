@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/signaller-matrix/signaller/internal"
 	"github.com/signaller-matrix/signaller/internal/models"
@@ -13,12 +14,13 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/rooms"
 	mSync "github.com/signaller-matrix/signaller/internal/models/sync"
+	"github.com/wangjia184/sortedset"
 )
 
 type Backend struct {
 	data                 map[string]internal.User
 	rooms                map[string]internal.Room
-	events               map[string]rooms.Event
+	events               *sortedset.SortedSet
 	roomAliases          map[string]internal.Room
 	hostname             string
 	validateUsernameFunc func(string) error // TODO: create ability to redefine validation func
@@ -35,7 +37,7 @@ func NewBackend(hostname string) *Backend {
 		validateUsernameFunc: defaultValidationUsernameFunc,
 		rooms:                make(map[string]internal.Room),
 		roomAliases:          make(map[string]internal.Room),
-		events:               make(map[string]rooms.Event),
+		events:               sortedset.New(),
 		data:                 make(map[string]internal.User)}
 }
 
@@ -187,14 +189,57 @@ func (backend *Backend) GetEventByID(id string) rooms.Event {
 	backend.mutex.RLock()
 	defer backend.mutex.RUnlock()
 
-	return backend.events[id]
+	return backend.events.GetByKey(id).Value.(rooms.Event)
 }
 
 func (backend *Backend) PutEvent(event rooms.Event) error {
 	backend.mutex.Lock()
 	defer backend.mutex.Unlock()
 
-	backend.events[event.EventID] = event
+	backend.events.AddOrUpdate(event.EventID, sortedset.SCORE(time.Now().Unix()), event)
 
 	return nil
+}
+
+func (backend *Backend) GetEventsSince(user User, sinceToken string, limit int) []rooms.Event {
+	sinceEventNode := backend.events.GetByKey(sinceToken)
+	sEvents := backend.events.GetByScoreRange(sinceEventNode.Score(), -1, &sortedset.GetByScoreRangeOptions{
+		Limit: limit,
+	})
+
+	events := extractEventsFromNodes(sEvents)
+
+	var returnEvents []rooms.Event
+	for _, event := range events {
+		if isEventRelatedToUser(event, user) {
+			returnEvents = append(returnEvents, event)
+		}
+	}
+
+	return returnEvents
+}
+
+func extractEventsFromNodes(nodes []*sortedset.SortedSetNode) []rooms.Event {
+	var events []rooms.Event
+	for _, e := range nodes {
+		events = append(events, e.Value.(rooms.Event))
+	}
+
+	return events
+}
+
+func isEventRelatedToUser(event rooms.Event, user User) bool {
+	if internal.InArray(event.RoomID, extractRoomIDsFromModel(user.JoinedRooms())) {
+		return true
+	}
+	return false
+}
+
+func extractRoomIDsFromModel(rooms []internal.Room) []string {
+	var roomIDs []string
+	for _, room := range rooms {
+		roomIDs = append(roomIDs, room.ID())
+	}
+
+	return roomIDs
 }

@@ -37,3 +37,12 @@ func roomsToPublicRoomsChunks(rooms []Room) []publicrooms.PublicRoomsChunk {
 
 	return chunks
 }
+
+func InArray(a string, arr []string) bool {
+	for _, b := range arr {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
