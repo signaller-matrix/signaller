@@ -6,50 +6,6 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/events"
 )
 
-// Type is type of event
-type Type string
-
-const (
-	// https://matrix.org/docs/spec/client_server/latest#m-room-aliases
-	Aliases Type = "m.room.aliases"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-canonical-alias
-	CanonicalAlias = "m.room.canonical_alias"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-create
-	Create = "m.room.create"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-join-rules
-	JoinRules = "m.room.join_rules"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-member
-	Member = "m.room.member"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-power-levels
-	PowerLevels = "m.room.power_levels"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-redaction
-	Redaction = "m.room.redaction"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-message
-	Message = "m.room.message"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-message-feedback
-	MessageFeedback = "m.room.message.feedback"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-name
-	Name = "m.room.name"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-topic
-	Topic = "m.room.topic"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-avatar
-	Avatar = "m.room.avatar"
-
-	// https://matrix.org/docs/spec/client_server/latest#m-room-pinned-events
-	PinnedEvents = "m.room.pinned_events"
-)
-
 type JoinRule string
 
 const (
