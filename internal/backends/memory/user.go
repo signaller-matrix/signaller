@@ -10,7 +10,6 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/devices"
-	"github.com/signaller-matrix/signaller/internal/models/rooms"
 )
 
 type User struct {
@@ -50,7 +49,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 	// Create room event
 	events = append(events, RoomEvent{
 		Content:        nil,
-		Type:           rooms.Create,
+		Type:           common.Create,
 		EventID:        internal.RandomString(eventIDSize),
 		Sender:         user,
 		OriginServerTS: t})
@@ -60,7 +59,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 	// Set join rules event
 	events = append(events, RoomEvent{
 		Content:        []byte(request.Visibility), // TODO: check visibility vs join rules
-		Type:           rooms.JoinRules,
+		Type:           common.JoinRules,
 		EventID:        internal.RandomString(eventIDSize),
 		Sender:         user,
 		OriginServerTS: t})
@@ -69,7 +68,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 	if request.Name != "" {
 		events = append(events, RoomEvent{
 			Content:        nil, // TODO: add
-			Type:           rooms.Name,
+			Type:           common.Name,
 			EventID:        internal.RandomString(eventIDSize),
 			Sender:         user,
 			OriginServerTS: t})
@@ -79,7 +78,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 	if request.RoomAliasName != "" {
 		events = append(events, RoomEvent{
 			Content:        nil, // TODO: add
-			Type:           rooms.CanonicalAlias,
+			Type:           common.CanonicalAlias,
 			EventID:        internal.RandomString(eventIDSize),
 			Sender:         user,
 			OriginServerTS: t})
@@ -125,7 +124,7 @@ func (user *User) SetTopic(room internal.Room, topic string) models.ApiError {
 	memRoom.mutex.Unlock()
 
 	rEvent := &RoomEvent{
-		Type:           rooms.Topic,
+		Type:           common.Topic,
 		Sender:         user,
 		OriginServerTS: time.Now(),
 		Room:           room}
@@ -206,7 +205,7 @@ func (user *User) SendMessage(room internal.Room, text string) models.ApiError {
 
 	rEvent := &RoomEvent{
 		Content:        nil,
-		Type:           rooms.Message,
+		Type:           common.Message,
 		EventID:        internal.RandomString(defaultTokenSize),
 		Sender:         user,
 		OriginServerTS: time.Now(),

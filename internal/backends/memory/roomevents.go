@@ -5,12 +5,13 @@ import (
 	"time"
 
 	"github.com/signaller-matrix/signaller/internal"
+	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/rooms"
 )
 
 type RoomEvent struct {
 	Content        json.RawMessage
-	Type           rooms.Type
+	Type           common.EventType
 	EventID        string
 	Sender         internal.User
 	OriginServerTS time.Time
