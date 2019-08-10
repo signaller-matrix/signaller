@@ -5,7 +5,7 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/devices"
-	"github.com/signaller-matrix/signaller/internal/models/rooms"
+	"github.com/signaller-matrix/signaller/internal/models/events"
 	"github.com/signaller-matrix/signaller/internal/models/sync"
 )
 
@@ -18,10 +18,10 @@ type Backend interface {
 	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err models.ApiError)
 	PublicRooms(filter string) []Room
 	ValidateUsernameFunc() func(string) error
-	GetEventByID(id string) rooms.Event
-	PutEvent(rooms.Event) error
+	GetEventByID(id string) events.Event
+	PutEvent(events.Event) error
 	GetRoomByAlias(string) Room
-	GetEventsSince(user User, sinceToken string, limit int) []rooms.Event
+	GetEventsSince(user User, sinceToken string, limit int) []events.Event
 }
 
 type Room interface {

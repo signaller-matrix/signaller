@@ -10,6 +10,7 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/devices"
+	"github.com/signaller-matrix/signaller/internal/models/events"
 )
 
 type User struct {
@@ -42,46 +43,46 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 		}
 	}
 
-	t := time.Now()
+	currentUnixTime := time.Now().Unix()
 
-	events := make([]RoomEvent, 0)
+	eventsSlice := make([]events.RoomEvent, 0)
 
 	// Create room event
-	events = append(events, RoomEvent{
-		Content:        nil,
-		Type:           common.Create,
+	eventsSlice = append(eventsSlice, events.RoomEvent{
+		ContentData:    nil,
+		EType:          events.Create,
 		EventID:        internal.RandomString(eventIDSize),
-		Sender:         user,
-		OriginServerTS: t})
+		Sender:         user.ID(),
+		OriginServerTs: currentUnixTime})
 
 	// TODO: Add join room event
 
 	// Set join rules event
-	events = append(events, RoomEvent{
-		Content:        []byte(request.Visibility), // TODO: check visibility vs join rules
-		Type:           common.JoinRules,
+	eventsSlice = append(eventsSlice, events.RoomEvent{
+		ContentData:    []byte(request.Visibility), // TODO: check visibility vs join rules
+		EType:          events.JoinRules,
 		EventID:        internal.RandomString(eventIDSize),
-		Sender:         user,
-		OriginServerTS: t})
+		Sender:         user.ID(),
+		OriginServerTs: currentUnixTime})
 
 	// Set room name event
 	if request.Name != "" {
-		events = append(events, RoomEvent{
-			Content:        nil, // TODO: add
-			Type:           common.Name,
+		eventsSlice = append(eventsSlice, events.RoomEvent{
+			ContentData:    nil, // TODO: add
+			EType:          events.Name,
 			EventID:        internal.RandomString(eventIDSize),
-			Sender:         user,
-			OriginServerTS: t})
+			Sender:         user.ID(),
+			OriginServerTs: currentUnixTime})
 	}
 
 	// Set room alias event
 	if request.RoomAliasName != "" {
-		events = append(events, RoomEvent{
-			Content:        nil, // TODO: add
-			Type:           common.CanonicalAlias,
+		eventsSlice = append(eventsSlice, events.RoomEvent{
+			ContentData:    nil, // TODO: add
+			EType:          events.CanonicalAlias,
 			EventID:        internal.RandomString(eventIDSize),
-			Sender:         user,
-			OriginServerTS: t})
+			Sender:         user.ID(),
+			OriginServerTs: currentUnixTime})
 	}
 
 	room := &Room{
@@ -95,13 +96,12 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 		server:     user.backend,
 		state:      request.Preset}
 
-	for i, _ := range events {
-		events[i].Room = room
-		//v.Room = room
+	for i, _ := range eventsSlice {
+		eventsSlice[i].RoomID = room.id
 	}
 
-	for i, _ := range events {
-		user.backend.PutEvent(events[i].ToEvent())
+	for i, _ := range eventsSlice {
+		user.backend.PutEvent(&eventsSlice[i])
 	}
 
 	user.backend.rooms[room.ID()] = room
@@ -123,13 +123,13 @@ func (user *User) SetTopic(room internal.Room, topic string) models.ApiError {
 
 	memRoom.mutex.Unlock()
 
-	rEvent := &RoomEvent{
-		Type:           common.Topic,
-		Sender:         user,
-		OriginServerTS: time.Now(),
-		Room:           room}
+	rEvent := &events.RoomEvent{
+		EType:          events.Topic,
+		Sender:         user.ID(),
+		OriginServerTs: time.Now().Unix(),
+		RoomID:         memRoom.id}
 
-	user.backend.PutEvent(rEvent.ToEvent())
+	user.backend.PutEvent(rEvent)
 
 	return nil
 }
@@ -203,15 +203,15 @@ func (user *User) SendMessage(room internal.Room, text string) models.ApiError {
 		return models.NewError(models.M_FORBIDDEN, "")
 	}
 
-	rEvent := &RoomEvent{
-		Content:        nil,
-		Type:           common.Message,
+	rEvent := &events.RoomEvent{
+		ContentData:    nil,
+		EType:          events.Message,
 		EventID:        internal.RandomString(defaultTokenSize),
-		Sender:         user,
-		OriginServerTS: time.Now(),
-		Room:           room}
+		Sender:         user.ID(),
+		OriginServerTs: time.Now().Unix(),
+		RoomID:         memRoom.id}
 
-	user.backend.PutEvent(rEvent.ToEvent())
+	user.backend.PutEvent(rEvent)
 
 	return nil
 }

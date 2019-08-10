@@ -2,6 +2,7 @@ package memory
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 	"sort"
 	"strings"
@@ -12,7 +13,7 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models"
 	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
-	"github.com/signaller-matrix/signaller/internal/models/rooms"
+	"github.com/signaller-matrix/signaller/internal/models/events"
 	mSync "github.com/signaller-matrix/signaller/internal/models/sync"
 	"github.com/wangjia184/sortedset"
 )
@@ -185,32 +186,32 @@ func defaultValidationUsernameFunc(userName string) error {
 	return nil
 }
 
-func (backend *Backend) GetEventByID(id string) rooms.Event {
+func (backend *Backend) GetEventByID(id string) events.Event {
 	backend.mutex.RLock()
 	defer backend.mutex.RUnlock()
 
-	return backend.events.GetByKey(id).Value.(rooms.Event)
+	return backend.events.GetByKey(id).Value.(events.Event)
 }
 
-func (backend *Backend) PutEvent(event rooms.Event) error {
+func (backend *Backend) PutEvent(event events.Event) error {
 	backend.mutex.Lock()
 	defer backend.mutex.Unlock()
 
-	backend.events.AddOrUpdate(event.EventID, sortedset.SCORE(time.Now().Unix()), event)
+	backend.events.AddOrUpdate(event.ID(), sortedset.SCORE(time.Now().Unix()), event)
 
 	return nil
 }
 
-func (backend *Backend) GetEventsSince(user internal.User, sinceToken string, limit int) []rooms.Event {
+func (backend *Backend) GetEventsSince(user internal.User, sinceToken string, limit int) []events.Event {
 	sinceEventNode := backend.events.GetByKey(sinceToken)
 	sEvents := backend.events.GetByScoreRange(sinceEventNode.Score(), -1, &sortedset.GetByScoreRangeOptions{
 		Limit: limit,
 	})
 
-	events := extractEventsFromNodes(sEvents)
+	eventsSlice := extractEventsFromNodes(sEvents)
 
-	var returnEvents []rooms.Event
-	for _, event := range events {
+	var returnEvents []events.Event
+	for _, event := range eventsSlice {
 		if isEventRelatedToUser(event, user) {
 			returnEvents = append(returnEvents, event)
 		}
@@ -219,17 +220,21 @@ func (backend *Backend) GetEventsSince(user internal.User, sinceToken string, li
 	return returnEvents
 }
 
-func extractEventsFromNodes(nodes []*sortedset.SortedSetNode) []rooms.Event {
-	var events []rooms.Event
+func extractEventsFromNodes(nodes []*sortedset.SortedSetNode) []events.Event {
+	var eventsSlice []events.Event
 	for _, e := range nodes {
-		events = append(events, e.Value.(rooms.Event))
+		eventsSlice = append(eventsSlice, e.Value.(events.Event))
 	}
 
-	return events
+	return eventsSlice
 }
 
-func isEventRelatedToUser(event rooms.Event, user internal.User) bool {
-	if internal.InArray(event.RoomID, extractRoomIDsFromModel(user.JoinedRooms())) {
+func isEventRelatedToUser(event events.Event, user internal.User) bool {
+	// get RoomID field from event interface
+	// TODO: what if there are no RoomID field?
+	roomID := reflect.ValueOf(event).Elem().FieldByName("RoomID").Addr().Interface().(string)
+
+	if internal.InArray(roomID, extractRoomIDsFromModel(user.JoinedRooms())) {
 		return true
 	}
 	return false

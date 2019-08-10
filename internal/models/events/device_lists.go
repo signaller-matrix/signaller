@@ -1,4 +1,4 @@
-package common
+package events
 
 type DeviceLists struct {
 	Changed []string `json:"changed"` // List of users who have updated their device identity keys, or who now share an encrypted room with the client since the previous sync response.
