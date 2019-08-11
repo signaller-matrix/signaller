@@ -2,7 +2,6 @@ package memory
 
 import (
 	"fmt"
-	"reflect"
 	"regexp"
 	"sort"
 	"strings"
@@ -230,13 +229,12 @@ func extractEventsFromNodes(nodes []*sortedset.SortedSetNode) []events.Event {
 }
 
 func isEventRelatedToUser(event events.Event, user internal.User) bool {
-	// get RoomID field from event interface
-	// TODO: what if there are no RoomID field?
-	roomID := reflect.ValueOf(event).Elem().FieldByName("RoomID").Addr().Interface().(string)
-
-	if internal.InArray(roomID, extractRoomIDsFromModel(user.JoinedRooms())) {
-		return true
+	if roomEvent, ok := event.(*events.RoomEvent); ok {
+		if internal.InArray(roomEvent.RoomID, extractRoomIDsFromModel(user.JoinedRooms())) {
+			return true
+		}
 	}
+
 	return false
 }
 
