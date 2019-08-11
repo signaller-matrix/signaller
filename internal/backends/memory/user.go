@@ -11,6 +11,7 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/devices"
 	"github.com/signaller-matrix/signaller/internal/models/events"
+	mSync "github.com/signaller-matrix/signaller/internal/models/sync"
 )
 
 type User struct {
@@ -350,4 +351,8 @@ func (user *User) GetFilterByID(filterID string) *common.Filter {
 	}
 
 	return nil
+}
+
+func (user *User) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err models.ApiError) {
+	return nil, nil
 }

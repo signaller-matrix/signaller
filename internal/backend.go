@@ -15,7 +15,6 @@ type Backend interface {
 	GetUserByToken(token string) (user User)
 	GetUserByName(userName string) User
 	GetRoomByID(id string) Room
-	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err models.ApiError)
 	PublicRooms(filter string) []Room
 	ValidateUsernameFunc() func(string) error
 	GetEventByID(id string) events.Event
@@ -59,4 +58,5 @@ type User interface {
 	GetFilterByID(filterID string) *common.Filter
 	AddRoomAlias(Room, string) models.ApiError
 	DeleteRoomAlias(string) models.ApiError
+	Sync(token string, request sync.SyncRequest) (response *sync.SyncReply, err models.ApiError)
 }

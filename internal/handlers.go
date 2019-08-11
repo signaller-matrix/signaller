@@ -281,18 +281,24 @@ func SyncHandler(w http.ResponseWriter, r *http.Request) {
 
 	timeout, err := strconv.Atoi(r.FormValue("timeout"))
 	if err != nil {
-		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "timeout parse failes")
+		errorResponse(w, models.M_UNKNOWN, http.StatusBadRequest, "timeout parse failed")
 		return
 	}
 	request.Timeout = timeout
 
 	token := getTokenFromResponse(r)
 	if token == "" {
-		errorResponse(w, models.M_MISSING_TOKEN, http.StatusBadRequest, "")
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
 		return
 	}
 
-	response, _ := currServer.Backend.Sync(token, request) // TODO: handle error
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	response, _ := user.Sync(token, request) // TODO: handle error
 
 	response.NextBatch = "123"
 	response.Rooms = mSync.RoomsSyncReply{}

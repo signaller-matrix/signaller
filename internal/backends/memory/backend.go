@@ -13,7 +13,6 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/events"
-	mSync "github.com/signaller-matrix/signaller/internal/models/sync"
 	"github.com/wangjia184/sortedset"
 )
 
@@ -87,13 +86,6 @@ func (backend *Backend) Login(username, password, device string) (user internal.
 	backend.data[username].(*User).Tokens[token] = Token{Device: device}
 
 	return user, token, nil
-}
-
-func (backend *Backend) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err models.ApiError) {
-	backend.mutex.Lock()
-	defer backend.mutex.Unlock()
-
-	return nil, nil // TODO: implement
 }
 
 func (backend *Backend) GetUserByToken(token string) internal.User {
