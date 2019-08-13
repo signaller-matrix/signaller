@@ -4,6 +4,7 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/events"
 )
 
+// SyncReply is model of sync respond
 type SyncReply struct {
 	NextBatch              string             `json:"next_batch"`                 // Required. The batch token to supply in the since param of the next /sync request.
 	Rooms                  RoomsSyncReply     `json:"rooms"`                      // Updates to rooms.
@@ -18,4 +19,30 @@ type RoomsSyncReply struct {
 	Join   map[string]events.JoinedRoom  `json:"join"`   // The rooms that the user has joined.
 	Invite map[string]events.InvitedRoom `json:"invite"` // The rooms that the user has been invited to.
 	Leave  map[string]events.LeftRoom    `json:"leave"`  // The rooms that the user has left or been banned from.
+}
+
+// BuildEmptySyncReply is function which builds empty SyncReply model
+func BuildEmptySyncReply() *SyncReply {
+	return &SyncReply{
+		NextBatch: "",
+		Rooms: RoomsSyncReply{
+			Join:   make(map[string]events.JoinedRoom),
+			Invite: make(map[string]events.InvitedRoom),
+			Leave:  make(map[string]events.LeftRoom),
+		},
+		Presence: events.Presence{
+			Events: nil,
+		},
+		AccountData: events.AccountData{
+			Events: nil,
+		},
+		ToDevice: events.ToDevice{
+			Events: nil,
+		},
+		DeviceLists: events.DeviceLists{
+			Changed: nil,
+			Left:    nil,
+		},
+		DeviceOneTimeKeysCount: make(map[string]int),
+	}
 }
