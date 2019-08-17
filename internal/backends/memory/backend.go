@@ -222,7 +222,7 @@ func extractEventsFromNodes(nodes []*sortedset.SortedSetNode) []events.Event {
 
 func isEventRelatedToUser(event events.Event, user internal.User) bool {
 	if roomEvent, ok := event.(*events.RoomEvent); ok {
-		if internal.InArray(roomEvent.RoomID, extractRoomIDsFromModel(user.JoinedRooms())) {
+		if internal.InArray(roomEvent.RoomID, extractRoomIDsFromModel(user.JoinedRooms())) { // TODO check for invited or archived rooms
 			return true
 		}
 	}

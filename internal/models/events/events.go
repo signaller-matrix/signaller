@@ -92,7 +92,7 @@ type signed struct {
 }
 
 type State struct {
-	events []StateEvent `json:"events"` // List of events.
+	Events []StateEvent `json:"events"` // List of events.
 }
 
 type Invite struct {

@@ -354,5 +354,54 @@ func (user *User) GetFilterByID(filterID string) *common.Filter {
 }
 
 func (user *User) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err models.ApiError) {
-	return nil, nil
+	response = mSync.BuildEmptySyncReply()
+
+	eventsList := user.backend.GetEventsSince(user, request.Since, 0) // TODO filtering
+	var eventListEmpty bool
+	if len(eventsList) != 0 {
+		eventListEmpty = false
+	}
+
+	if !eventListEmpty {
+		for _, room := range user.JoinedRooms() {
+			filteredEventList := filterEventsByRoom(room.ID(), eventsList)
+			var prevBatch string
+			if len(filteredEventList) != 0 {
+				prevBatch = filteredEventList[0].ID()
+			}
+			response.Rooms.Join[room.ID()] = mSync.JoinedRoom{
+				RoomSummary: mSync.RoomSummary{
+					Heroes:             nil,
+					JoinedMemberCount:  0,
+					InvitedMemberCount: 0,
+				},
+				State: events.State{
+					Events: nil,
+				},
+				Timeline: mSync.Timeline{
+					Events:    filteredEventList,
+					Limited:   false, // TODO filtering
+					PrevBatch: prevBatch,
+				},
+			}
+		}
+		response.NextBatch = eventsList[len(eventsList)-1].ID()
+	} else {
+		// TODO wait for new events or just return empty response when timeout is reached
+	}
+
+	return response, nil
+}
+
+func filterEventsByRoom(roomID string, eventList []events.Event) []events.RoomEvent {
+	var filteredEventList []events.RoomEvent
+	for _, event := range eventList {
+		if roomEvent, ok := event.(events.RoomEvent); ok {
+			if roomEvent.RoomID == roomID {
+				filteredEventList = append(filteredEventList, event.(events.RoomEvent))
+			}
+		}
+	}
+
+	return filteredEventList
 }

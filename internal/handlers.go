@@ -300,9 +300,6 @@ func SyncHandler(w http.ResponseWriter, r *http.Request) {
 
 	response, _ := user.Sync(token, request) // TODO: handle error
 
-	response.NextBatch = "123"
-	response.Rooms = mSync.RoomsSyncReply{}
-
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
