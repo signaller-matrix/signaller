@@ -355,14 +355,20 @@ func (user *User) GetFilterByID(filterID string) *common.Filter {
 
 func (user *User) Sync(token string, request mSync.SyncRequest) (response *mSync.SyncReply, err models.ApiError) {
 	response = mSync.BuildEmptySyncReply()
+	emptyEventList := true
+	emptySinceToken := true
+	var eventsList []events.Event
 
-	eventsList := user.backend.GetEventsSince(user, request.Since, 0) // TODO filtering
-	var eventListEmpty bool
-	if len(eventsList) != 0 {
-		eventListEmpty = false
+	if request.Since != "" {
+		emptySinceToken = false
+		eventsList := user.backend.GetEventsSince(user, request.Since, 0) // TODO filtering
+
+		if len(eventsList) != 0 {
+			emptyEventList = false
+		}
 	}
 
-	if !eventListEmpty {
+	if !emptyEventList {
 		for _, room := range user.JoinedRooms() {
 			filteredEventList := filterEventsByRoom(room.ID(), eventsList)
 			var prevBatch string
@@ -386,6 +392,8 @@ func (user *User) Sync(token string, request mSync.SyncRequest) (response *mSync
 			}
 		}
 		response.NextBatch = eventsList[len(eventsList)-1].ID()
+	} else if emptySinceToken {
+		// TODO
 	} else {
 		// TODO wait for new events or just return empty response when timeout is reached
 	}
