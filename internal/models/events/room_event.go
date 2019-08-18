@@ -15,14 +15,14 @@ type RoomEvent struct {
 	RoomID         string          `json:"room_id"`          // Required. The ID of the room associated with this event. Will not be present on events that arrive through /sync, despite being required everywhere else.
 }
 
-func (roomEvent RoomEvent) Content() json.RawMessage {
-	return roomEvent.ContentData
+func (this *RoomEvent) Content() json.RawMessage {
+	return this.ContentData
 }
 
-func (roomEvent RoomEvent) ID() string {
-	return roomEvent.EventID
+func (this *RoomEvent) ID() string {
+	return this.EventID
 }
 
-func (roomEvent RoomEvent) Type() EventType {
-	return roomEvent.EType
+func (this *RoomEvent) Type() EventType {
+	return this.EType
 }

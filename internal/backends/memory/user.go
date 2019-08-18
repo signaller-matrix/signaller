@@ -404,9 +404,9 @@ func (user *User) Sync(token string, request mSync.SyncRequest) (response *mSync
 func filterEventsByRoom(roomID string, eventList []events.Event) []events.RoomEvent {
 	var filteredEventList []events.RoomEvent
 	for _, event := range eventList {
-		if roomEvent, ok := event.(events.RoomEvent); ok {
+		if roomEvent, ok := event.(*events.RoomEvent); ok {
 			if roomEvent.RoomID == roomID {
-				filteredEventList = append(filteredEventList, event.(events.RoomEvent))
+				filteredEventList = append(filteredEventList, *event.(*events.RoomEvent))
 			}
 		}
 	}

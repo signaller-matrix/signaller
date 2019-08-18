@@ -15,7 +15,6 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/events"
 	"github.com/tidwall/buntdb"
-	"github.com/wangjia184/sortedset"
 )
 
 type Backend struct {
@@ -232,7 +231,7 @@ func (backend *Backend) GetEventsSince(user internal.User, sinceToken string, li
 			if err == nil {
 				json.Unmarshal([]byte(val), sinceEvent)
 			}
-			sinceRoomEvent := sinceEvent.(events.RoomEvent)
+			sinceRoomEvent := sinceEvent.(*events.RoomEvent)
 			tx.AscendRange("origin_server_ts", `{"origin_server_ts": `+string(sinceRoomEvent.OriginServerTs)+`}`, `{"origin_server_ts": `+string(time.Now().Unix())+`}`, func(key, value string) bool {
 				var unmarshalledEvent events.Event
 				json.Unmarshal([]byte(value), unmarshalledEvent)
@@ -259,15 +258,6 @@ func (backend *Backend) GetEventsSince(user internal.User, sinceToken string, li
 	}
 
 	return nil
-}
-
-func extractEventsFromNodes(nodes []*sortedset.SortedSetNode) []events.Event {
-	var eventsSlice []events.Event
-	for _, e := range nodes {
-		eventsSlice = append(eventsSlice, e.Value.(events.Event))
-	}
-
-	return eventsSlice
 }
 
 func isEventRelatedToUser(event events.Event, user internal.User) bool {
