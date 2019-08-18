@@ -1,11 +1,13 @@
 package memory
 
 import (
+	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
+	"github.com/signaller-matrix/signaller/internal"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
+	"github.com/signaller-matrix/signaller/internal/models/events"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterUser(t *testing.T) {
@@ -187,4 +189,27 @@ func TestNewUserNameValidate(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, user)
 	assert.Empty(t, token)
+}
+
+func TestGetEventsSince(t *testing.T) {
+	type args struct {
+		user       internal.User
+		sinceToken string
+		limit      int
+	}
+	tests := []struct {
+		name string
+		args args
+		want []events.Event
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			backend := NewBackend("localhost")
+			if got := backend.GetEventsSince(tt.args.user, tt.args.sinceToken, tt.args.limit); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Backend.GetEventsSince() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
