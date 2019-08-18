@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
@@ -13,13 +14,14 @@ import (
 	"github.com/signaller-matrix/signaller/internal/models/common"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 	"github.com/signaller-matrix/signaller/internal/models/events"
+	"github.com/tidwall/buntdb"
 	"github.com/wangjia184/sortedset"
 )
 
 type Backend struct {
 	data                 map[string]internal.User
 	rooms                map[string]internal.Room
-	events               *sortedset.SortedSet
+	events               *buntdb.DB
 	roomAliases          map[string]internal.Room
 	hostname             string
 	validateUsernameFunc func(string) error // TODO: create ability to redefine validation func
@@ -31,12 +33,18 @@ type Token struct {
 }
 
 func NewBackend(hostname string) *Backend {
+	eventDB, err := buntdb.Open(":memory:")
+	if err != nil {
+		panic(err)
+	}
+	eventDB.CreateIndex("origin_server_ts", "*", buntdb.IndexJSON("origin_server_ts"))
+	eventDB.CreateIndex("room_id", "*", buntdb.IndexJSON("room_id"))
 	return &Backend{
 		hostname:             hostname,
 		validateUsernameFunc: defaultValidationUsernameFunc,
 		rooms:                make(map[string]internal.Room),
 		roomAliases:          make(map[string]internal.Room),
-		events:               sortedset.New(),
+		events:               eventDB,
 		data:                 make(map[string]internal.User)}
 }
 
@@ -181,34 +189,76 @@ func (backend *Backend) GetEventByID(id string) events.Event {
 	backend.mutex.RLock()
 	defer backend.mutex.RUnlock()
 
-	return backend.events.GetByKey(id).Value.(events.Event)
+	var event events.Event
+
+	backend.events.View(func(tx *buntdb.Tx) error {
+		val, err := tx.Get(id, true)
+		if err == nil {
+			json.Unmarshal([]byte(val), event)
+		}
+		return nil
+	})
+	return event
 }
 
 func (backend *Backend) PutEvent(event events.Event) error {
 	backend.mutex.Lock()
 	defer backend.mutex.Unlock()
 
-	backend.events.AddOrUpdate(event.ID(), sortedset.SCORE(time.Now().Unix()), event)
+	marshalledEvent, err := json.Marshal(event)
+	if err != nil {
+		return err
+	}
+
+	err = backend.events.Update(func(tx *buntdb.Tx) error {
+		_, _, err := tx.Set(event.ID(), string(marshalledEvent), nil)
+		return err
+	})
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
 func (backend *Backend) GetEventsSince(user internal.User, sinceToken string, limit int) []events.Event {
-	sinceEventNode := backend.events.GetByKey(sinceToken)
-	sEvents := backend.events.GetByScoreRange(sinceEventNode.Score(), -1, &sortedset.GetByScoreRangeOptions{
-		Limit: limit,
-	})
+	if sinceToken != "" {
+		var sinceEvent events.Event
+		var eventSlice []events.Event
+		err := backend.events.View(func(tx *buntdb.Tx) error {
+			// handler error
+			val, err := tx.Get(sinceToken, true)
+			if err == nil {
+				json.Unmarshal([]byte(val), sinceEvent)
+			}
+			sinceRoomEvent := sinceEvent.(events.RoomEvent)
+			tx.AscendRange("origin_server_ts", `{"origin_server_ts": `+string(sinceRoomEvent.OriginServerTs)+`}`, `{"origin_server_ts": `+string(time.Now().Unix())+`}`, func(key, value string) bool {
+				var unmarshalledEvent events.Event
+				json.Unmarshal([]byte(value), unmarshalledEvent)
+				eventSlice = append(eventSlice, unmarshalledEvent)
+				return true
+			})
+			return err
+		})
 
-	eventsSlice := extractEventsFromNodes(sEvents)
-
-	var returnEvents []events.Event
-	for _, event := range eventsSlice {
-		if isEventRelatedToUser(event, user) {
-			returnEvents = append(returnEvents, event)
+		if err != nil {
+			panic(err)
 		}
+
+		var returnEvents []events.Event
+		if eventSlice != nil {
+			for _, event := range eventSlice {
+				if isEventRelatedToUser(event, user) {
+					returnEvents = append(returnEvents, event)
+				}
+			}
+		}
+
+		return returnEvents
 	}
 
-	return returnEvents
+	return nil
 }
 
 func extractEventsFromNodes(nodes []*sortedset.SortedSetNode) []events.Event {
