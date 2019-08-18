@@ -3,6 +3,8 @@
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 [![Build Status](https://travis-ci.com/signaller-matrix/signaller.svg?branch=master)](https://travis-ci.com/signaller-matrix/signaller)
 [![Coverage Status](https://coveralls.io/repos/github/signaller-matrix/signaller/badge.svg)](https://coveralls.io/github/signaller-matrix/signaller)
+[![English Chat Room](https://img.shields.io/matrix/signaller_dev:netwhood.online?label=English%20Chat%20Room&server_fqdn=matrix.netwhood.online)](https://matrix.to/#/#signaller_dev:netwhood.online)
+[![Russian Chat Room](https://img.shields.io/matrix/signaller_dev_ru:netwhood.online?label=Russian%20Chat%20Room&server_fqdn=matrix.netwhood.online)](https://matrix.to/#/#signaller_dev_ru:netwhood.online)
 
 > A Matrix homeserver, which written in Go language.
 
