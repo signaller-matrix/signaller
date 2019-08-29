@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/signaller-matrix/signaller/internal/models/createroom"
+
 	"github.com/gorilla/mux"
 
 	"github.com/signaller-matrix/signaller/internal/models"
@@ -539,6 +541,37 @@ func publicRoomsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+	sendJsonResponse(w, http.StatusOK, response)
+}
+
+// https://matrix.org/docs/spec/client_server/latest#post-matrix-client-r0-createroom
+func createRoomHandler(w http.ResponseWriter, r *http.Request) {
+	token := getTokenFromResponse(r)
+	if token == "" {
+		errorResponse(w, models.M_FORBIDDEN, http.StatusForbidden, "")
+		return
+	}
+
+	user := currServer.Backend.GetUserByToken(token)
+	if user == nil {
+		errorResponse(w, models.M_UNKNOWN_TOKEN, http.StatusBadRequest, "")
+		return
+	}
+
+	var request createroom.Request
+	err := getRequest(r, &request)
+	if err != nil {
+		errorResponse(w, models.M_BAD_JSON, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	room, apiErr := user.CreateRoom(request)
+	if err != nil {
+		errorResponse(w, apiErr, http.StatusBadRequest, apiErr.Error())
+		return
+	}
+
+	response := createroom.Response{RoomID: room.ID()}
 	sendJsonResponse(w, http.StatusOK, response)
 }
 
