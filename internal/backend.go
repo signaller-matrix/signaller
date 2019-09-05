@@ -21,12 +21,17 @@ type Backend interface {
 	PutEvent(events.Event) error
 	GetRoomByAlias(string) Room
 	GetEventsSince(user User, sinceToken string, limit int) []events.Event
+	GetRecentEventsOfRoom(roomID string, user User, limit int) []events.Event
+	Hostname() string
+	Rooms() map[string]Room   // RoomID : Room
+	Aliases() map[string]Room // Alias : Room
+	PutRoom(room Room) error
 }
 
 type Room interface {
 	ID() string
-	Creator() User
-	Users() []User
+	Creator() string
+	Users() []string
 	AliasName() string
 	Aliases() []string
 	Name() string
@@ -36,6 +41,8 @@ type Room interface {
 	GuestCanJoin() bool
 	AvatarURL() string
 	State() createroom.Preset
+	PutInvited(invitedID string)
+	PutJoined(joinedID string)
 }
 
 type User interface {

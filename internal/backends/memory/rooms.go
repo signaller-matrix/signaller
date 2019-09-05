@@ -3,7 +3,6 @@ package memory
 import (
 	"sync"
 
-	"github.com/signaller-matrix/signaller/internal"
 	"github.com/signaller-matrix/signaller/internal/models/createroom"
 )
 
@@ -18,9 +17,9 @@ type Room struct {
 	guestCanJoin  bool
 	avatarURL     string
 
-	creator internal.User
-	joined  []internal.User
-	invites []internal.User
+	creator string
+	joined  []string
+	invites []string
 
 	server *Backend
 
@@ -69,11 +68,11 @@ func (room *Room) Topic() string {
 	return room.topic
 }
 
-func (room *Room) Users() []internal.User {
-	room.mutex.RLock()
-	defer room.mutex.RUnlock()
+func (this *Room) Users() []string {
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 
-	return room.joined
+	return this.joined
 }
 
 func (room *Room) Visibility() createroom.VisibilityType {
@@ -83,11 +82,11 @@ func (room *Room) Visibility() createroom.VisibilityType {
 	return room.visibility
 }
 
-func (room *Room) Creator() internal.User {
-	room.mutex.RLock()
-	defer room.mutex.RUnlock()
+func (this *Room) Creator() string {
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
 
-	return room.creator
+	return this.creator
 }
 
 func (room *Room) State() createroom.Preset {
@@ -116,4 +115,18 @@ func (room *Room) AvatarURL() string {
 	defer room.mutex.RUnlock()
 
 	return room.avatarURL
+}
+
+func (this *Room) PutInvited(invitedID string) {
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+
+	this.invites = append(this.invites, invitedID)
+}
+
+func (this *Room) PutJoined(joinedID string) {
+	this.mutex.RLock()
+	defer this.mutex.RUnlock()
+
+	this.joined = append(this.joined, joinedID)
 }

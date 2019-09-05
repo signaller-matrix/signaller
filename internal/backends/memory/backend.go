@@ -278,3 +278,7 @@ func extractRoomIDsFromModel(rooms []internal.Room) []string {
 
 	return roomIDs
 }
+
+func (this *Backend) PutRoom(room *Room) {
+	this.rooms[room.ID()] = room
+}

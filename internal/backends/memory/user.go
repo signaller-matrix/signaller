@@ -91,8 +91,8 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 		aliasName:  request.RoomAliasName,
 		name:       request.Name,
 		topic:      request.Topic,
-		creator:    user,
-		joined:     []internal.User{user},
+		creator:    user.ID(),
+		joined:     []string{user.ID()},
 		visibility: request.Visibility,
 		server:     user.backend,
 		state:      request.Preset}
@@ -105,7 +105,7 @@ func (user *User) CreateRoom(request createroom.Request) (internal.Room, models.
 		user.backend.PutEvent(&eventsSlice[i])
 	}
 
-	user.backend.rooms[room.ID()] = room
+	user.backend.PutRoom(room)
 
 	return room, nil
 }
@@ -115,7 +115,7 @@ func (user *User) SetTopic(room internal.Room, topic string) models.ApiError {
 
 	memRoom.mutex.Lock()
 
-	if memRoom.creator.ID() != user.ID() { // TODO: currently only creator can change topic
+	if memRoom.creator != user.ID() { // TODO: currently only creator can change topic
 		memRoom.mutex.Unlock()
 		return models.NewError(models.M_FORBIDDEN, "")
 	}
@@ -144,7 +144,7 @@ func (user *User) Invite(room internal.Room, invitee internal.User) models.ApiEr
 	userInRoom := false
 
 	for _, roomUser := range memRoom.joined {
-		if user.ID() == roomUser.ID() {
+		if user.ID() == roomUser {
 			userInRoom = true
 		}
 	}
@@ -155,19 +155,18 @@ func (user *User) Invite(room internal.Room, invitee internal.User) models.ApiEr
 
 	// TODO: remove repeated cycle
 	for _, roomUser := range memRoom.joined {
-		if roomUser.ID() == invitee.ID() {
+		if roomUser == invitee.ID() {
 			return models.NewError(models.M_FORBIDDEN, "the invitee is already a member of the room.") // TODO: check code
 		}
 	}
 
 	for _, inviteeUser := range memRoom.invites {
-		if inviteeUser.ID() == invitee.ID() {
+		if inviteeUser == invitee.ID() {
 			return models.NewError(models.M_FORBIDDEN, "user already has been invited") // TODO: check code
 		}
 	}
 
-	memRoom.invites = append(memRoom.invites, invitee) // TODO: add invite event + info about inviter
-
+	memRoom.PutInvited(invitee.ID()) // TODO: add invite event + info about inviter
 	return nil
 }
 
@@ -178,7 +177,7 @@ func (user *User) LeaveRoom(room internal.Room) models.ApiError {
 	defer memRoom.mutex.Unlock()
 
 	for i, roomMember := range room.(*Room).joined {
-		if roomMember.ID() == user.ID() {
+		if roomMember == user.ID() {
 			room.(*Room).joined = append(room.(*Room).joined[:i], room.(*Room).joined[i+1:]...) // TODO: add event
 			return nil
 		}
@@ -195,7 +194,7 @@ func (user *User) SendMessage(room internal.Room, text string) models.ApiError {
 
 	userInRoom := false
 	for _, roomMember := range memRoom.joined {
-		if roomMember.ID() == user.ID() {
+		if roomMember == user.ID() {
 			userInRoom = true
 		}
 	}
@@ -225,7 +224,7 @@ func (user *User) JoinedRooms() []internal.Room {
 
 	for _, room := range user.backend.rooms {
 		for _, user := range room.(*Room).joined {
-			if user.ID() == user.ID() {
+			if user == user {
 				result = append(result, room)
 			}
 		}
@@ -251,7 +250,7 @@ func (user *User) Devices() []devices.Device {
 }
 
 func (user *User) SetRoomVisibility(room internal.Room, visibilityType createroom.VisibilityType) models.ApiError {
-	if user.ID() != room.Creator().ID() {
+	if user.ID() != room.Creator() {
 		return models.NewError(models.M_FORBIDDEN, "only room owner can change visibility") // TODO: room administrators can use this method too
 	}
 
@@ -290,12 +289,12 @@ func (user *User) JoinRoom(room internal.Room) models.ApiError {
 	defer memRoom.mutex.Unlock()
 
 	for _, roomUser := range memRoom.joined {
-		if roomUser.ID() == user.ID() {
+		if roomUser == user.ID() {
 			return models.NewError(models.M_BAD_STATE, "user already in room") // TODO: check code
 		}
 	}
 
-	memRoom.joined = append(memRoom.joined, user)
+	memRoom.PutJoined(user.ID())
 
 	return nil
 }
@@ -304,7 +303,7 @@ func (user *User) AddRoomAlias(room internal.Room, alias string) models.ApiError
 	user.backend.mutex.Lock()
 	defer user.backend.mutex.Unlock()
 
-	if room.Creator().ID() != user.ID() {
+	if room.Creator() != user.ID() {
 		return models.NewError(models.M_FORBIDDEN, "only room creator can add room alias") // TODO: make room admins can use this method
 	}
 
@@ -326,7 +325,7 @@ func (user *User) DeleteRoomAlias(alias string) models.ApiError {
 		return models.NewError(models.M_NOT_FOUND, "room not found")
 	}
 
-	if room.Creator().ID() != user.ID() {
+	if room.Creator() != user.ID() {
 		return models.NewError(models.M_FORBIDDEN, "only room creator can delete room alias") // TODO: make room admins can use this method
 	}
 
